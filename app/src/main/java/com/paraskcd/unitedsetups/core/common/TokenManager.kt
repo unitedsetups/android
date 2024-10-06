@@ -16,6 +16,7 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
 
         authData?.let {
             editor.putString(Constants.TOKEN_KEY, it.token).apply()
+            editor.putString(Constants.USER_ID_KEY, it.id).apply()
             editor.putBoolean(Constants.IS_LOGGED_IN_KEY, true).apply()
         }
     }
@@ -26,5 +27,9 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
 
     fun isLoggedIn(): Boolean {
         return preferences.getBoolean(Constants.IS_LOGGED_IN_KEY, false)
+    }
+
+    fun getUserId(): String? {
+        return preferences.getString(Constants.USER_ID_KEY, null)
     }
 }

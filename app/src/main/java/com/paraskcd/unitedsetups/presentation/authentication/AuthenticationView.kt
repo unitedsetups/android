@@ -12,12 +12,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -30,22 +32,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import com.paraskcd.unitedsetups.presentation.components.EmailTextField
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.paraskcd.unitedsetups.R
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import kotlinx.coroutines.launch
 
-
 @Composable
-fun AuthenticationView(modifier: Modifier = Modifier) {
+fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: AuthenticationViewModel) {
+    var register by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
-    val authenticationViewModel : AuthenticationViewModel = hiltViewModel()
     val composableScope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -56,7 +57,7 @@ fun AuthenticationView(modifier: Modifier = Modifier) {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxWidth().height((256).dp)
         )
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
@@ -74,32 +75,66 @@ fun AuthenticationView(modifier: Modifier = Modifier) {
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth().height(96.dp).padding(bottom = 16.dp)
                 )
-                TextField(
+                if(register) {
+                    TextField(
+                        value = authenticationViewModel.username,
+                        onValueChange = { username -> authenticationViewModel.updateUsername(username) },
+                        label = { Text("Username") },
+                        singleLine = true,
+                        trailingIcon = {
+                            Icon(imageVector = Icons.Filled.Person, contentDescription = "Username Icon")
+                        },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = DarkColorScheme.error
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                            .background(
+                                color = DarkColorScheme.background,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                    )
+                    TextField(
+                        value = authenticationViewModel.name,
+                        onValueChange = { name -> authenticationViewModel.updateName(name) },
+                        label = { Text("Display Name") },
+                        singleLine = true,
+                        trailingIcon = {
+                            Icon(imageVector = Icons.Filled.Person, contentDescription = "Username Icon")
+                        },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = DarkColorScheme.error
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                            .background(
+                                color = DarkColorScheme.background,
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                    )
+                }
+                EmailTextField(
                     value = authenticationViewModel.email,
                     onValueChange = { email -> authenticationViewModel.updateEmail(email) },
-                    label = { Text("Email") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    trailingIcon = {
-                        Icon(imageVector = Icons.Filled.Email, contentDescription = "Email Icon")
-                    },
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = DarkColorScheme.error
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                        .background(
-                            color = DarkColorScheme.background,
-                            shape = RoundedCornerShape(16.dp)
-                        )
+                    label = "Email",
+                    icon = Icons.Filled.Email,
+                    imageDescription = "Email Icon"
                 )
                 TextField(
                     value = authenticationViewModel.password,
@@ -152,11 +187,50 @@ fun AuthenticationView(modifier: Modifier = Modifier) {
                 Button(
                     onClick = {
                         composableScope.launch {
-                            authenticationViewModel.login()
+                            if (register) {
+                                val error = authenticationViewModel.register()
+                                if (error == null) {
+                                    register = false
+                                }
+                            } else {
+                                authenticationViewModel.login()
+                            }
                         }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    enabled =
+                        if (register) {
+                            authenticationViewModel.username.isNotBlank()
+                                    && authenticationViewModel.name.isNotBlank()
+                                    && authenticationViewModel.email.isNotBlank()
+                                    && authenticationViewModel.password.isNotBlank()
+                        } else {
+                            authenticationViewModel.email.isNotBlank()
+                                    && authenticationViewModel.password.isNotBlank()
+                        }
+                ) {
+                    if (register) {
+                        Text("Register")
+                    } else {
+                        Text("Login")
+                    }
+                }
+                TextButton(
+                    onClick = {
+                        register = !register
+                        authenticationViewModel.updateEmail("")
+                        authenticationViewModel.updatePassword("")
+                        authenticationViewModel.updateName("")
+                        authenticationViewModel.updateUsername("")
                     }
                 ) {
-                    Text("Login")
+                    if (register) {
+                        Text("Already have an account? Tap here to login")
+                    } else {
+                        Text("Don't have an account? Tap here to register")
+                    }
                 }
             }
         }

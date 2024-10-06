@@ -61,4 +61,5 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     implementation(libs.work.runtime.ktx)
     implementation(libs.material.icons.extended)
+    implementation(libs.navigation.compose)
 }

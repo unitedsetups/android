@@ -9,8 +9,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(private val tokenManager: TokenManager) : ViewModel() {
-    fun isLoggedIn(): Boolean {
-        return tokenManager.isLoggedIn()
+class MainActivityViewModel @Inject constructor(tokenManager: TokenManager) : ViewModel() {
+    var isLoggedIn by mutableStateOf(false)
+        private set
+
+    init {
+        isLoggedIn = tokenManager.isLoggedIn()
     }
 }
