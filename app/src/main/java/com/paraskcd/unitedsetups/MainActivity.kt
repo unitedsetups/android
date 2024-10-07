@@ -1,7 +1,9 @@
 package com.paraskcd.unitedsetups
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,6 +24,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.paraskcd.unitedsetups.core.common.TopLevelRoute
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationView
@@ -45,7 +52,14 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(
+                DarkColorScheme.surface.hashCode()
+            ),
+            navigationBarStyle = SystemBarStyle.dark(
+                DarkColorScheme.surface.hashCode()
+            )
+        )
         setContent {
             val mainViewModel: MainActivityViewModel = hiltViewModel()
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
@@ -57,18 +71,42 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(0)
             }
 
+            val currentBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "Home" } }
+
+            LaunchedEffect(currentRoute) {
+                Log.d("CurrentNavigation", topLevelRoutes.any { it.route == currentRoute }.toString())
+            }
+
             UnitedSetupsTheme {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
+                    floatingActionButton = {
+                        if (topLevelRoutes.any { it.route == currentRoute }
+                                && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
+                            FloatingActionButton(
+                                onClick = { navController.navigate("NewPost") },
+                                containerColor = DarkColorScheme.primary
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.EditNote,
+                                    contentDescription = "New Post"
+                                )
+                            }
+                        }
+                    },
                     topBar = {
-                        if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
+                        if (topLevelRoutes.any { it.route == currentRoute }
+                            && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
                             TopAppBar(
                                 title = {
                                     Image(
                                         painter = painterResource(id = R.drawable.uslogowhite),
                                         contentDescription = "Logo",
                                         contentScale = ContentScale.Fit,
-                                        modifier = Modifier.fillMaxWidth().height(64.dp)
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(64.dp)
                                     )
                                 },
                                 colors = TopAppBarDefaults.topAppBarColors(
@@ -79,7 +117,8 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     bottomBar = {
-                        if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
+                        if (topLevelRoutes.any { it.route == currentRoute }
+                            && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
                             NavigationBar(
                                 containerColor = DarkColorScheme.surface,
                                 contentColor = DarkColorScheme.background
@@ -89,7 +128,7 @@ class MainActivity : ComponentActivity() {
                                         colors = NavigationBarItemDefaults.colors(
                                             indicatorColor = DarkColorScheme.background
                                         ),
-                                        selected = index == navigationSelectedItem,
+                                        selected = item.route == currentRoute,
                                         label = {
                                             Text(item.name)
                                         },
