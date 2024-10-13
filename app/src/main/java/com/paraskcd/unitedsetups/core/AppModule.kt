@@ -6,10 +6,13 @@ import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.apis.IAuthApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IPostApi
+import com.paraskcd.unitedsetups.core.interfaces.apis.IUploadApi
 import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
+import com.paraskcd.unitedsetups.core.interfaces.repository.IUploadApiRepository
 import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
 import com.paraskcd.unitedsetups.data.repository.posts.PostApiRepository
+import com.paraskcd.unitedsetups.data.repository.upload.UploadApiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -82,5 +85,25 @@ object AppModule {
     @Provides
     fun providesPostRepository(postApi: IPostApi): IPostApiRepository {
         return PostApiRepository(postApi)
+    }
+
+    @Singleton
+    @Provides
+    fun providesUploadApi(okHttpClient: OkHttpClient): IUploadApi {
+        return Retrofit
+            .Builder()
+            .baseUrl(Constants.API)
+            .client(okHttpClient)
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .build()
+            .create(IUploadApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesUploadRepository(@ApplicationContext appContext: Context, uploadApi: IUploadApi): IUploadApiRepository {
+        return UploadApiRepository(uploadApi, appContext)
     }
 }

@@ -74,97 +74,96 @@ class MainActivity : ComponentActivity() {
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "Home" } }
 
-            LaunchedEffect(currentRoute) {
-                Log.d("CurrentNavigation", topLevelRoutes.any { it.route == currentRoute }.toString())
-            }
-
             UnitedSetupsTheme {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    floatingActionButton = {
-                        if (topLevelRoutes.any { it.route == currentRoute }
-                                && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
-                            FloatingActionButton(
-                                onClick = { navController.navigate("NewPost") },
-                                containerColor = DarkColorScheme.primary
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Filled.EditNote,
-                                    contentDescription = "New Post"
-                                )
-                            }
-                        }
-                    },
-                    topBar = {
-                        if (topLevelRoutes.any { it.route == currentRoute }
-                            && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
-                            TopAppBar(
-                                title = {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.uslogowhite),
-                                        contentDescription = "Logo",
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(64.dp)
-                                    )
-                                },
-                                colors = TopAppBarDefaults.topAppBarColors(
-                                    containerColor = DarkColorScheme.surface
-                                ),
-                                modifier = Modifier.shadow(16.dp)
-                            )
-                        }
-                    },
-                    bottomBar = {
-                        if (topLevelRoutes.any { it.route == currentRoute }
-                            && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
-                            NavigationBar(
-                                containerColor = DarkColorScheme.surface,
-                                contentColor = DarkColorScheme.background
-                            ) {
-                                topLevelRoutes.forEachIndexed { index, item ->
-                                    NavigationBarItem(
-                                        colors = NavigationBarItemDefaults.colors(
-                                            indicatorColor = DarkColorScheme.background
+                if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
+                    if (topLevelRoutes.any { it.route == currentRoute }) {
+                        Scaffold(
+                            modifier = Modifier.fillMaxSize(),
+                            floatingActionButton = {
+                                if (topLevelRoutes.any { it.route == currentRoute }
+                                    && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
+                                    FloatingActionButton(
+                                        onClick = { navController.navigate("NewPost") },
+                                        containerColor = DarkColorScheme.primary
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.EditNote,
+                                            contentDescription = "New Post"
+                                        )
+                                    }
+                                }
+                            },
+                            topBar = {
+                                if ((topLevelRoutes.any { it.route == currentRoute }) == true
+                                    && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
+                                    TopAppBar(
+                                        title = {
+                                            Image(
+                                                painter = painterResource(id = R.drawable.uslogowhite),
+                                                contentDescription = "Logo",
+                                                contentScale = ContentScale.Fit,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(64.dp)
+                                            )
+                                        },
+                                        colors = TopAppBarDefaults.topAppBarColors(
+                                            containerColor = DarkColorScheme.surface
                                         ),
-                                        selected = item.route == currentRoute,
-                                        label = {
-                                            Text(item.name)
-                                        },
-                                        icon = {
-                                            Icon(item.icon, contentDescription = item.name)
-                                        },
-                                        onClick = {
-                                            navigationSelectedItem = index
-                                            navController.navigate(item.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        }
+                                        modifier = Modifier.shadow(16.dp)
                                     )
                                 }
+                            },
+                            bottomBar = {
+                                if ((topLevelRoutes.any { it.route == currentRoute }) == true
+                                    && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
+                                    NavigationBar(
+                                        containerColor = DarkColorScheme.surface,
+                                        contentColor = DarkColorScheme.background
+                                    ) {
+                                        topLevelRoutes.forEachIndexed { index, item ->
+                                            NavigationBarItem(
+                                                colors = NavigationBarItemDefaults.colors(
+                                                    indicatorColor = DarkColorScheme.background
+                                                ),
+                                                selected = item.route == currentRoute,
+                                                label = {
+                                                    Text(item.name)
+                                                },
+                                                icon = {
+                                                    Icon(item.icon, contentDescription = item.name)
+                                                },
+                                                onClick = {
+                                                    navigationSelectedItem = index
+                                                    navController.navigate(item.route) {
+                                                        popUpTo(navController.graph.findStartDestination().id) {
+                                                            saveState = true
+                                                        }
+                                                        launchSingleTop = true
+                                                        restoreState = true
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
                             }
+                        ) { innerPadding ->
+                            MainView(
+                                modifier = Modifier.padding(innerPadding),
+                                navController
+                            )
                         }
-                    }
-                ) { innerPadding ->
-                    if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
-                        MainView(
-                            modifier = Modifier.padding(innerPadding),
-                            navController
-                        )
                     } else {
-                        AuthenticationView(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .fillMaxSize(),
-                            authenticationViewModel
-                        )
+                        MainView(modifier = Modifier, navController)
                     }
+                } else {
+                    AuthenticationView(
+                        modifier = Modifier.fillMaxSize(),
+                        authenticationViewModel = authenticationViewModel
+                    )
                 }
+
             }
         }
     }

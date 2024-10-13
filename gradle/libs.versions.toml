@@ -14,6 +14,7 @@ hiltWork = "1.2.0"
 workRuntime = "2.9.1"
 navCompose = "2.8.2"
 prettytime = "5.0.8.Final"
+commonIO = "2.17.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,7 @@ material-icons-extended = { group = "androidx.compose.material", name = "materia
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navCompose" }
 runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata"}
 prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref= "prettytime" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonIO"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

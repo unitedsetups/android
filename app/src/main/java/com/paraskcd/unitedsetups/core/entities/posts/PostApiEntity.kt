@@ -1,11 +1,11 @@
 package com.paraskcd.unitedsetups.core.entities.posts
 
-import android.util.Log
 import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.domain.model.PostMediaUrl
 import com.paraskcd.unitedsetups.domain.model.PostedBy
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.time.format.ResolverStyle
 
 data class PostApiEntity(
     val id: String,
@@ -36,8 +36,18 @@ fun PostApiEntity.toPost(): Post {
     return Post(
         id,
         text,
-        LocalDateTime.parse(createdDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")),
-        LocalDateTime.parse(updatedDateTime, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS")),
+        LocalDateTime.parse(
+            createdDateTime,
+            DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                .withResolverStyle(ResolverStyle.LENIENT)
+        ),
+        LocalDateTime.parse(
+            updatedDateTime,
+            DateTimeFormatter
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                .withResolverStyle(ResolverStyle.LENIENT)
+        ),
         upvotes,
         clicks,
         deviceId ?: "",

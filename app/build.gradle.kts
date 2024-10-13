@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.paraskcd.unitedsetups"
-        minSdk = 31
+        minSdk = 30
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -64,4 +64,5 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.runtime.livedata)
     implementation(libs.prettytime)
+    implementation(libs.commons.io)
 }

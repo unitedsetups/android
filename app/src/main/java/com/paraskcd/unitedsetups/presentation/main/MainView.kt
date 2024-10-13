@@ -6,10 +6,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.paraskcd.unitedsetups.presentation.main.screens.home.Home
-import com.paraskcd.unitedsetups.presentation.main.screens.NewPost
+import com.paraskcd.unitedsetups.presentation.main.screens.NewPost.NewPost
 
 @Composable
 fun MainView(modifier: Modifier = Modifier, navController: NavHostController) {
+
     NavHost(navController, startDestination = "Home", modifier) {
         composable("Home") {
             Home()

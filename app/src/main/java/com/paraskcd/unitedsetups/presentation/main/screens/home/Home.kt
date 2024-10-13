@@ -21,27 +21,12 @@ fun Home(modifier: Modifier = Modifier) {
 
     LaunchedEffect(viewModel) {
         viewModel.fetchPosts()
-        Log.d("fetchPosts", viewModel.posts.toString())
     }
 
     LazyColumn(modifier = modifier) {
         if (loading) {
             item {
                 PostSkeleton()
-            }
-            item {
-                PostSkeleton()
-            }
-            item {
-                PostSkeleton()
-            }
-            item {
-                PostSkeleton()
-            }
-            item {
-                PostSkeleton()
-            }
-            item {
                 PostSkeleton()
             }
         }
