@@ -5,15 +5,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.paraskcd.unitedsetups.core.common.TokenManager
+import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
 import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
-import com.paraskcd.unitedsetups.data.source.authentication.requests.LoginRequest
-import com.paraskcd.unitedsetups.data.source.authentication.requests.RegisterRequest
+import com.paraskcd.unitedsetups.core.requests.authentication.LoginRequest
+import com.paraskcd.unitedsetups.core.requests.authentication.RegisterRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthenticationViewModel @Inject constructor(
-    private val authApiRepository: AuthApiRepository,
+    private val authApiRepository: IAuthApiRepository,
     private val tokenManager: TokenManager
 ) : ViewModel() {
     var email by mutableStateOf("")

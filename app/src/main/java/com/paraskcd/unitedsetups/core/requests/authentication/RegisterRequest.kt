@@ -1,4 +1,4 @@
-package com.paraskcd.unitedsetups.data.source.authentication.requests
+package com.paraskcd.unitedsetups.core.requests.authentication
 
 data class RegisterRequest(
     val username: String,

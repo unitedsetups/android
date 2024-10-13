@@ -2,14 +2,15 @@ package com.paraskcd.unitedsetups.data.repository.authentication
 
 import android.util.Log
 import com.paraskcd.unitedsetups.core.common.DataOrException
-import com.paraskcd.unitedsetups.data.source.authentication.AuthApi
-import com.paraskcd.unitedsetups.data.source.authentication.entity.toAuth
-import com.paraskcd.unitedsetups.data.source.authentication.requests.LoginRequest
-import com.paraskcd.unitedsetups.data.source.authentication.requests.RegisterRequest
+import com.paraskcd.unitedsetups.core.interfaces.apis.IAuthApi
+import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
+import com.paraskcd.unitedsetups.core.entities.authentication.toAuth
+import com.paraskcd.unitedsetups.core.requests.authentication.LoginRequest
+import com.paraskcd.unitedsetups.core.requests.authentication.RegisterRequest
 import com.paraskcd.unitedsetups.domain.model.Auth
 import javax.inject.Inject
 
-class AuthApiRepository @Inject constructor(private val authApi: AuthApi): IAuthApiRepository {
+class AuthApiRepository @Inject constructor(private val authApi: IAuthApi): IAuthApiRepository {
     override suspend fun Login(request: LoginRequest): DataOrException<Auth, java.lang.Exception> {
         return try {
             DataOrException(authApi.Login(request).toAuth(), null)

@@ -1,4 +1,4 @@
-package com.paraskcd.unitedsetups.data.source.authentication.entity
+package com.paraskcd.unitedsetups.core.entities.authentication
 
 import com.paraskcd.unitedsetups.domain.model.Auth
 

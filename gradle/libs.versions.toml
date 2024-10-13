@@ -13,6 +13,7 @@ hiltNavigation = "1.2.0"
 hiltWork = "1.2.0"
 workRuntime = "2.9.1"
 navCompose = "2.8.2"
+prettytime = "5.0.8.Final"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,8 @@ coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigation" }
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navCompose" }
+runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata"}
+prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref= "prettytime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

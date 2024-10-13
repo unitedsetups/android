@@ -4,8 +4,12 @@ import android.content.Context
 import com.paraskcd.unitedsetups.core.common.AuthInterceptor
 import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.core.common.TokenManager
+import com.paraskcd.unitedsetups.core.interfaces.apis.IAuthApi
+import com.paraskcd.unitedsetups.core.interfaces.apis.IPostApi
+import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
+import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
 import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
-import com.paraskcd.unitedsetups.data.source.authentication.AuthApi
+import com.paraskcd.unitedsetups.data.repository.posts.PostApiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -42,7 +46,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesAuthApi(okHttpClient: OkHttpClient): AuthApi {
+    fun providesAuthApi(okHttpClient: OkHttpClient): IAuthApi {
         return Retrofit
                 .Builder()
                 .baseUrl(Constants.API)
@@ -51,12 +55,32 @@ object AppModule {
                     GsonConverterFactory.create()
                 )
                 .build()
-                .create(AuthApi::class.java)
+                .create(IAuthApi::class.java)
     }
 
     @Singleton
     @Provides
-    fun providesAuthRepository(authApi: AuthApi): AuthApiRepository {
+    fun providesAuthRepository(authApi: IAuthApi): IAuthApiRepository {
         return AuthApiRepository(authApi)
+    }
+
+    @Singleton
+    @Provides
+    fun providesPostApi(okHttpClient: OkHttpClient): IPostApi {
+        return Retrofit
+            .Builder()
+            .baseUrl(Constants.API)
+            .client(okHttpClient)
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .build()
+            .create(IPostApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesPostRepository(postApi: IPostApi): IPostApiRepository {
+        return PostApiRepository(postApi)
     }
 }

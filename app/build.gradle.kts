@@ -62,4 +62,6 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     implementation(libs.material.icons.extended)
     implementation(libs.navigation.compose)
+    implementation(libs.runtime.livedata)
+    implementation(libs.prettytime)
 }
