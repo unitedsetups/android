@@ -49,7 +49,7 @@ fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: A
     var showPassword by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(DarkColorScheme.background)) {
         Image(
             painter = painterResource(id = R.drawable.gradient_portrait_background),
             contentDescription = "BG Image",

@@ -43,6 +43,7 @@ import com.paraskcd.unitedsetups.core.common.TopLevelRoute
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationView
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationViewModel
 import com.paraskcd.unitedsetups.presentation.main.MainView
+import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import com.paraskcd.unitedsetups.ui.theme.UnitedSetupsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +64,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             val mainViewModel: MainActivityViewModel = hiltViewModel()
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
+            val homeViewModel: HomeViewModel = hiltViewModel()
+
+            LaunchedEffect(homeViewModel) {
+                homeViewModel.fetchPosts()
+                homeViewModel.getLoggedInUserId()
+            }
+
             val navController = rememberNavController()
             val topLevelRoutes = listOf(
                 TopLevelRoute("Home", "Home", Icons.Filled.Home)
@@ -83,7 +91,13 @@ class MainActivity : ComponentActivity() {
                                 if (topLevelRoutes.any { it.route == currentRoute }
                                     && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
                                     FloatingActionButton(
-                                        onClick = { navController.navigate("NewPost") },
+                                        onClick = { navController.navigate("NewPost") {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        } },
                                         containerColor = DarkColorScheme.primary
                                     ) {
                                         Icon(
@@ -151,11 +165,16 @@ class MainActivity : ComponentActivity() {
                         ) { innerPadding ->
                             MainView(
                                 modifier = Modifier.padding(innerPadding),
-                                navController
+                                navController = navController,
+                                homeViewModel = homeViewModel
                             )
                         }
                     } else {
-                        MainView(modifier = Modifier, navController)
+                        MainView(
+                            modifier = Modifier,
+                            navController = navController,
+                            homeViewModel = homeViewModel
+                        )
                     }
                 } else {
                     AuthenticationView(

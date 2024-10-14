@@ -9,6 +9,8 @@ data class User(
     val name: String,
     val telegramId: Long?,
     val profileImageUrl: String?,
+    val profileImageThumbnailUrl: String?,
     val coverImageUrl: String?,
+    val coverImageThumbnailUrl: String?,
     val role: UserRoles
 )

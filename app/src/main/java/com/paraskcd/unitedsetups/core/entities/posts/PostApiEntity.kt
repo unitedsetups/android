@@ -29,7 +29,7 @@ data class PostMediaUrlResponse(
 data class PostedByResponse(
     val name: String,
     val username: String,
-    val profileImageThumbnailUrl: String
+    val profileImageThumbnailUrl: String?
 )
 
 fun PostApiEntity.toPost(): Post {

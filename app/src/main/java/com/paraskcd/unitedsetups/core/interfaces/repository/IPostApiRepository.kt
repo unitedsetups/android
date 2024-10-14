@@ -9,4 +9,5 @@ import java.lang.Exception
 interface IPostApiRepository {
     suspend fun createNewPost(request: CreateNewPostRequest): DataOrException<Post, Exception>
     suspend fun getPosts(request: GetPostsRequest): DataOrException<List<Post>, Exception>
+    suspend fun getPostById(postId: String): DataOrException<Post, Exception>
 }

@@ -9,11 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostItem(post: Post) {
+fun PostItem(post: Post, loggedInUserId: String, navController: NavHostController) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -25,8 +26,8 @@ fun PostItem(post: Post) {
             )
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        PostHeader(post)
-        PostMedia(post)
+        PostHeader(post, loggedInUserId)
+        PostMedia(post, navController)
         PostFooter(post)
     }
 }

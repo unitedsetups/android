@@ -18,7 +18,7 @@ data class PostedBy(
     val id: String,
     val name: String,
     val username: String,
-    val profileImageThumbnailUrl: String
+    val profileImageThumbnailUrl: String?
 )
 
 data class PostMediaUrl(

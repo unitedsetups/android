@@ -42,7 +42,7 @@ fun PostFooter(post: Post) {
                     )
                     .padding(horizontal = 8.dp)
             ) {
-                IconButton(onClick = { /* TODO */ }) {
+                IconButton(onClick = { /* TODO */ }, modifier = Modifier.padding(horizontal = 8.dp)) {
                     Row {
                         Icon(
                             imageVector = Icons.Outlined.ThumbUp,

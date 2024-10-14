@@ -2,6 +2,7 @@ package com.paraskcd.unitedsetups.presentation.components
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,13 +24,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 
 @Composable
-fun PostMedia(post: Post) {
+fun PostMedia(post: Post, navController: NavHostController) {
     val pagerState = rememberPagerState(pageCount = { post.postMediaUrls.count() })
     var showShimmer by remember { mutableStateOf(false) }
     Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.BottomCenter) {
@@ -41,7 +45,16 @@ fun PostMedia(post: Post) {
                     .padding(horizontal = 8.dp)
                     .fillMaxWidth()
                     .height(256.dp)
-                    .clip(RoundedCornerShape(corner = CornerSize(16.dp))),
+                    .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
+                    .clickable {
+                        navController.navigate("PostImage/${post.id}") {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 AsyncImage(

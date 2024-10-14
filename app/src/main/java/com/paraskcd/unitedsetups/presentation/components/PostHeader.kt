@@ -3,16 +3,23 @@ package com.paraskcd.unitedsetups.presentation.components
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.outlined.DeleteForever
+import androidx.compose.material.icons.outlined.DevicesOther
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material.icons.outlined.PhonelinkSetup
+import androidx.compose.material.icons.outlined.Report
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -38,7 +45,7 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostHeader(post: Post) {
+fun PostHeader(post: Post, loggedInUserId: String) {
     var menuExpanded by remember {
         mutableStateOf(false)
     }
@@ -52,12 +59,27 @@ fun PostHeader(post: Post) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                AsyncImage(
-                    model = Uri.parse("${Constants.BASE_URL}/${post.postedBy.profileImageThumbnailUrl}"),
-                    contentDescription = "Profile Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(32.dp).clip(CircleShape).background(shimmerBrush())
-                )
+                if (post.postedBy.profileImageThumbnailUrl?.isNotEmpty() == true) {
+                    AsyncImage(
+                        model = Uri.parse("${Constants.BASE_URL}/${post.postedBy.profileImageThumbnailUrl}"),
+                        contentDescription = "Profile Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(shimmerBrush())
+                    )
+                } else {
+                    Box(modifier = Modifier
+                        .size(32.dp)
+                        .background(DarkColorScheme.background, shape = CircleShape), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Filled.Person,
+                            contentDescription = "Profile Icon",
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = post.postedBy.name,
@@ -82,34 +104,93 @@ fun PostHeader(post: Post) {
                     onDismissRequest = { menuExpanded = false },
                     modifier = Modifier.background(DarkColorScheme.surface)
                 ) {
-                    DropdownMenuItem(
-                        text = {
-                            Text("Add Device")
-                        },
-                        onClick = { /* TODO */ },
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Text("Add Setup Items")
-                        },
-                        onClick = { /* TODO */ },
-                    )
-                    DropdownMenuItem(
-                        text = {
-                            Text("Edit Post")
-                        },
-                        onClick = { /* TODO */ },
-                    )
-                    HorizontalDivider()
-                    DropdownMenuItem(
-                        text = {
-                            Text(
-                                text = "Delete",
-                                color = MaterialTheme.colorScheme.error
-                            )
-                        },
-                        onClick = { /* TODO */ },
-                    )
+                    if (post.postedBy.id == loggedInUserId) {
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.DevicesOther,
+                                        contentDescription = "Add Device",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Add Device")
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.PhonelinkSetup,
+                                        contentDescription = "Add Setup Items",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Add Setup Items")
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.EditNote,
+                                        contentDescription = "Edit Post",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Edit Post")
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                        HorizontalDivider()
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.DeleteForever,
+                                        contentDescription = "Delete Post",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Delete Post",
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                    }
+                    else {
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Report,
+                                        contentDescription = "Report",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Report")
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Bookmark,
+                                        contentDescription = "Bookmark",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Bookmark")
+                                }
+                            },
+                            onClick = { /* TODO */ },
+                        )
+                    }
                 }
             }
         }

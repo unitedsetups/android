@@ -5,6 +5,7 @@ import com.paraskcd.unitedsetups.core.requests.posts.CreateNewPostRequest
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.QueryMap
 
 interface IPostApi {
@@ -13,4 +14,7 @@ interface IPostApi {
 
     @GET("posts")
     suspend fun getPosts(@QueryMap request: Map<@JvmSuppressWildcards String, @JvmSuppressWildcards Any>): List<PostApiEntity>
+
+    @GET("posts/{postId}")
+    suspend fun getPostById(@Path("postId") postId: String): PostApiEntity
 }

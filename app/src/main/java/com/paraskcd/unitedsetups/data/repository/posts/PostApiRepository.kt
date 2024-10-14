@@ -30,4 +30,13 @@ class PostApiRepository @Inject constructor(private val postApi: IPostApi) : IPo
             DataOrException(null, ex)
         }
     }
+
+    override suspend fun getPostById(postId: String): DataOrException<Post, Exception> {
+        return try {
+            DataOrException(postApi.getPostById(postId).toPost(), null)
+        } catch (ex: Exception) {
+            Log.e("getPostById", ex.message.toString())
+            DataOrException(null, ex)
+        }
+    }
 }
