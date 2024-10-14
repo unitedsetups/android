@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -42,6 +43,9 @@ import coil.compose.AsyncImage
 import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
+import net.engawapg.lib.zoomable.ScrollGesturePropagation
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,90 +75,100 @@ fun PostImage(postId: String, navController: NavHostController) {
         }
     }
     else {
-        Scaffold(topBar = {
-            TopAppBar(
-                title = { Text("") },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }) { padding ->
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxSize()
-                    .background(DarkColorScheme.background)
-            ) {
-                if (post != null) {
-                    var showShimmer by remember { mutableStateOf(false) }
-                    val pagerState = rememberPagerState(pageCount = { post!!.postMediaUrls.count() })
-                    val contrast = 1f // 0f..10f (1 should be default)
-                    val brightness = -180f // -255f..255f (0 should be default)
-                    val colorMatrix = floatArrayOf(
-                        contrast, 0f, 0f, 0f, brightness,
-                        0f, contrast, 0f, 0f, brightness,
-                        0f, 0f, contrast, 0f, brightness,
-                        0f, 0f, 0f, 1f, 0f
-                    )
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
-                        HorizontalPager(state = pagerState) { page ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                AsyncImage(
-                                    model = Uri.parse("${Constants.BASE_URL}/${post!!.postMediaUrls[page].thumbnailPath}"),
-                                    contentDescription = post!!.text,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .blur(radius = 16.dp)
-                                        .alpha(0.25f)
-                                        .background(
-                                            shimmerBrush(
-                                                showShimmer = showShimmer,
-                                                targetValue = 1300f
-                                            )
-                                        ),
-                                    onSuccess = { showShimmer = false },
-                                    onLoading = { showShimmer = true },
-                                    colorFilter = ColorFilter.colorMatrix(ColorMatrix(colorMatrix))
-                                )
-                                AsyncImage(
-                                    model = Uri.parse("${Constants.BASE_URL}/${post!!.postMediaUrls[page].path}"),
-                                    contentDescription = post!!.text,
-                                    contentScale = ContentScale.Fit,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(
-                                            shimmerBrush(
-                                                showShimmer = showShimmer,
-                                                targetValue = 1300f
-                                            )
-                                        ),
-                                    onSuccess = { showShimmer = false },
-                                    onLoading = { showShimmer = true },
-                                )
-                            }
-                        }
-                        if (post!!.postMediaUrls.count() > 1) {
-                            Row(modifier = Modifier.padding(8.dp)) {
-                                (0..(post!!.postMediaUrls.count() - 1)).forEach { index ->
-                                    val color = if (pagerState.currentPage == index) {
-                                        Color.White.copy(alpha = 1f)
-                                    } else {
-                                        Color.White.copy(alpha = 0.5f)
-                                    }
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(horizontal = 4.dp)
-                                            .background(color, shape = CircleShape)
-                                            .size(8.dp)
-                                    )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(DarkColorScheme.background)
+        ) {
+            if (post != null) {
+                var showShimmer by remember { mutableStateOf(false) }
+                val pagerState = rememberPagerState(pageCount = { post!!.postMediaUrls.count() })
+                val contrast = 1f // 0f..10f (1 should be default)
+                val brightness = -180f // -255f..255f (0 should be default)
+                val colorMatrix = floatArrayOf(
+                    contrast, 0f, 0f, 0f, brightness,
+                    0f, contrast, 0f, 0f, brightness,
+                    0f, 0f, contrast, 0f, brightness,
+                    0f, 0f, 0f, 1f, 0f
+                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
+                    HorizontalPager(state = pagerState) { page ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            val zoomState = rememberZoomState()
+                            // Reset zoom state when the page is moved out of the window.
+                            val isVisible = page == pagerState.settledPage
+                            LaunchedEffect(isVisible) {
+                                if (!isVisible) {
+                                    zoomState.reset()
                                 }
+                            }
+                            AsyncImage(
+                                model = Uri.parse("${Constants.BASE_URL}/${post!!.postMediaUrls[page].thumbnailPath}"),
+                                contentDescription = post!!.text,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .blur(radius = 16.dp)
+                                    .alpha(0.25f)
+                                    .background(
+                                        shimmerBrush(
+                                            showShimmer = showShimmer,
+                                            targetValue = 1300f
+                                        )
+                                    ),
+                                onSuccess = { showShimmer = false },
+                                onLoading = { showShimmer = true },
+                                colorFilter = ColorFilter.colorMatrix(ColorMatrix(colorMatrix))
+                            )
+                            AsyncImage(
+                                model = Uri.parse("${Constants.BASE_URL}/${post!!.postMediaUrls[page].path}"),
+                                contentDescription = post!!.text,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        shimmerBrush(
+                                            showShimmer = showShimmer,
+                                            targetValue = 1300f
+                                        )
+                                    )
+                                    .zoomable(
+                                        zoomState = zoomState,
+                                        scrollGesturePropagation = ScrollGesturePropagation.ContentEdge,
+                                        onDoubleTap = { position ->
+                                            val targetScale = when {
+                                                zoomState.scale < 2f -> 2f
+                                                else -> 1f
+                                            }
+                                            zoomState.changeScale(targetScale, position)
+                                        }
+                                    ),
+                                onSuccess = { state ->
+                                    showShimmer = false
+                                    zoomState.setContentSize(state.painter.intrinsicSize)
+                                },
+                                onLoading = { showShimmer = true },
+                            )
+                        }
+                    }
+                    if (post!!.postMediaUrls.count() > 1) {
+                        Row(modifier = Modifier.padding(8.dp)) {
+                            (0..(post!!.postMediaUrls.count() - 1)).forEach { index ->
+                                val color = if (pagerState.currentPage == index) {
+                                    Color.White.copy(alpha = 1f)
+                                } else {
+                                    Color.White.copy(alpha = 0.5f)
+                                }
+                                Box(
+                                    modifier = Modifier
+                                        .padding(horizontal = 4.dp)
+                                        .background(color, shape = CircleShape)
+                                        .size(8.dp)
+                                )
                             }
                         }
                     }

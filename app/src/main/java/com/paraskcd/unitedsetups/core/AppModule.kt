@@ -7,12 +7,15 @@ import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.apis.IAuthApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IPostApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IUploadApi
+import com.paraskcd.unitedsetups.core.interfaces.apis.IUserApi
 import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IUploadApiRepository
+import com.paraskcd.unitedsetups.core.interfaces.repository.IUserApiRepository
 import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
 import com.paraskcd.unitedsetups.data.repository.posts.PostApiRepository
 import com.paraskcd.unitedsetups.data.repository.upload.UploadApiRepository
+import com.paraskcd.unitedsetups.data.repository.users.UserApiRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -105,5 +108,25 @@ object AppModule {
     @Provides
     fun providesUploadRepository(@ApplicationContext appContext: Context, uploadApi: IUploadApi): IUploadApiRepository {
         return UploadApiRepository(uploadApi, appContext)
+    }
+
+    @Singleton
+    @Provides
+    fun providesUserApi(okHttpClient: OkHttpClient): IUserApi {
+        return Retrofit
+            .Builder()
+            .baseUrl(Constants.API)
+            .client(okHttpClient)
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .build()
+            .create(IUserApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesUserRepository(userApi: IUserApi): IUserApiRepository {
+        return UserApiRepository(userApi)
     }
 }

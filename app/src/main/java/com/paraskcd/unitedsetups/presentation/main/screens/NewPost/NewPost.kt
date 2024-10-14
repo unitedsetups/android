@@ -3,12 +3,17 @@ package com.paraskcd.unitedsetups.presentation.main.screens.NewPost
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +42,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -50,6 +56,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import kotlinx.coroutines.android.awaitFrame
@@ -65,6 +72,8 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
     val focusRequester = remember { FocusRequester() }
     val loading by remember { newPostViewModel.loading }
     val composableScope = rememberCoroutineScope()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "Home" } }
 
     val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(maxItems = 5),
@@ -105,45 +114,12 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
             }
         }
     } else {
-        Scaffold(
-            contentWindowInsets = WindowInsets(0.dp),
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text("New Post")
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = DarkColorScheme.surface
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                        }
-                    }
-                )
-            },
-            bottomBar = {
-                Row(
-                    modifier = Modifier
-                        .safeDrawingPadding()
-                        .fillMaxWidth()
-                        .background(DarkColorScheme.surface),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    IconButton(onClick = { launchPhotoPicker() }, modifier = Modifier.padding(start = 16.dp)) {
-                        Icon(imageVector = Icons.Filled.Image, contentDescription = "Image")
-                    }
-                    IconButton(onClick = { createNewPost()  }, modifier = Modifier.padding(end = 16.dp)) {
-                        Icon(imageVector = Icons.Filled.Send, contentDescription = "Send")
-                    }
-                }
-            }
-        ) { innerPadding ->
-            Column(
-                modifier = modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-            ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
                 if (selectedImages.count() > 0) {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
                         HorizontalPager(state = pagerState) { page ->
@@ -205,6 +181,26 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
                         errorIndicatorColor = Color.Transparent
                     )
                 )
+            }
+            AnimatedVisibility(
+                visible = currentRoute == "NewPost",
+                enter = expandVertically(expandFrom = Alignment.Top),
+                exit = shrinkVertically(shrinkTowards = Alignment.Top)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(DarkColorScheme.surface)
+                        .safeDrawingPadding(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = { launchPhotoPicker() }, modifier = Modifier.padding(start = 16.dp)) {
+                        Icon(imageVector = Icons.Filled.Image, contentDescription = "Image")
+                    }
+                    IconButton(onClick = { createNewPost()  }, modifier = Modifier.padding(end = 16.dp)) {
+                        Icon(imageVector = Icons.Filled.Send, contentDescription = "Send")
+                    }
+                }
             }
         }
     }

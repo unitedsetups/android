@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -42,7 +43,6 @@ fun PostMedia(post: Post, navController: NavHostController) {
         ) { page ->
             Box(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
                     .fillMaxWidth()
                     .height(256.dp)
                     .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
@@ -64,6 +64,7 @@ fun PostMedia(post: Post, navController: NavHostController) {
                     modifier = Modifier
                         .fillMaxSize()
                         .blur(radius = 16.dp)
+                        .alpha(0.25f)
                         .background(shimmerBrush(showShimmer = showShimmer, targetValue = 1300f)),
                     onSuccess = { showShimmer = false },
                     onLoading = { showShimmer = true },
@@ -71,9 +72,8 @@ fun PostMedia(post: Post, navController: NavHostController) {
                 AsyncImage(
                     model = Uri.parse("${Constants.BASE_URL}/${post.postMediaUrls[page].thumbnailPath}"),
                     contentDescription = post.text,
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .width(256.dp)
                         .height(256.dp)
                         .background(shimmerBrush(showShimmer = showShimmer, targetValue = 1300f)),
                     onSuccess = { showShimmer = false },

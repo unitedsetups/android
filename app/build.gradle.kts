@@ -65,4 +65,5 @@ dependencies {
     implementation(libs.runtime.livedata)
     implementation(libs.prettytime)
     implementation(libs.commons.io)
+    implementation(libs.zoomable)
 }

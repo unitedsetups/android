@@ -15,6 +15,7 @@ workRuntime = "2.9.1"
 navCompose = "2.8.2"
 prettytime = "5.0.8.Final"
 commonIO = "2.17.0"
+zoomable = "1.6.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,7 @@ navigation-compose = { group = "androidx.navigation", name = "navigation-compose
 runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata"}
 prettytime = { group = "org.ocpsoft.prettytime", name = "prettytime", version.ref= "prettytime" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonIO"}
+zoomable = { group = "net.engawapg.lib", name = "zoomable", version.ref = "zoomable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
