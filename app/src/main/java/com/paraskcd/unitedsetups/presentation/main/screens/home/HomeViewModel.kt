@@ -20,9 +20,7 @@ class HomeViewModel @Inject constructor(
     private val postApiRepository: IPostApiRepository,
     private val tokenManager: TokenManager
 ) : ViewModel() {
-    private var _posts = MutableLiveData<List<Post>>()
-    val posts: LiveData<List<Post>>
-        get() = _posts
+    var posts = mutableStateOf<List<Post>>(emptyList())
     var loading = mutableStateOf(false)
     var loggedInUserId = mutableStateOf("")
     var scrollIndex = mutableStateOf(0)
@@ -40,8 +38,7 @@ class HomeViewModel @Inject constructor(
             pageIndex.value = 0
             loading.value = true
             val postResponse = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, null))
-            _posts.value = postResponse.data ?: emptyList()
-            Log.d("HomeViewModel", "Posts: ${_posts.value}")
+            posts.value = postResponse.data ?: emptyList()
             loading.value = false
             if (postResponse.data?.isNotEmpty() == true) {
                 pageIndex.value = pageIndex.value + 1
@@ -57,7 +54,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             loading.value = true
             val postResponse = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, null))
-            _posts.value = postResponse.data ?: emptyList()
+            posts.value = posts.value.plus(postResponse.data ?: emptyList())
             loading.value = false
             if (postResponse.data?.isNotEmpty() == true) {
                 pageIndex.value = pageIndex.value + 1

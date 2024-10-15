@@ -11,7 +11,6 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +22,7 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewModel: HomeViewModel) {
-    val posts = viewModel.posts.observeAsState(emptyList()).value
+    val posts by remember { viewModel.posts }
     val loading by remember { viewModel.loading }
     val stopFetching by remember { viewModel.stopFetching }
     val loggedInUserId by remember { viewModel.loggedInUserId }

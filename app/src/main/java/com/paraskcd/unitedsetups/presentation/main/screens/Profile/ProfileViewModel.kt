@@ -56,7 +56,7 @@ class ProfileViewModel @Inject constructor(
             loading.value = true
             val id = user.value?.id
             val result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, id))
-            posts.value = result.data ?: emptyList()
+            posts.value = posts.value.plus(result.data ?: emptyList())
             loading.value = false
             if (result.data?.isNotEmpty() == true) {
                 pageIndex.value = pageIndex.value + 1
