@@ -2,6 +2,7 @@ package com.paraskcd.unitedsetups.presentation.components
 
 import android.net.Uri
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +40,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import coil.compose.AsyncImage
 import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.domain.model.Post
@@ -45,10 +50,13 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostHeader(post: Post, loggedInUserId: String) {
+fun PostHeader(post: Post, loggedInUserId: String, navController: NavHostController) {
     var menuExpanded by remember {
         mutableStateOf(false)
     }
+
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "" } }
 
     Column {
         Row(
@@ -58,6 +66,17 @@ fun PostHeader(post: Post, loggedInUserId: String) {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.clickable {
+                    if (!currentRoute.contains("Profile")) {
+                        navController.navigate("Profile/${post.postedBy.id}") {
+                            popUpTo(currentRoute) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                }
             ) {
                 if (post.postedBy.profileImageThumbnailUrl?.isNotEmpty() == true) {
                     AsyncImage(

@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +33,21 @@ fun MainView(modifier: Modifier = Modifier, navController: NavHostController, ho
         }
         composable(route = "Profile") {
             Profile(navController = navController)
+        }
+        composable(route = "Profile/{userId}") { backstackEntry ->
+            var userId = backstackEntry.arguments?.getString("userId")
+            if (homeViewModel.loggedInUserId.equals(userId)) {
+                navController.navigate("Profile") {
+                    popUpTo(navController.graph.findStartDestination().id) {
+                        saveState = true
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+            }
+            userId?.let {
+                Profile(navController = navController, userId = userId)
+            }
         }
         composable("NewPost") {
             NewPost(navController = navController)

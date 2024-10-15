@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -27,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.paraskcd.unitedsetups.core.common.Constants
@@ -37,6 +39,9 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 fun PostMedia(post: Post, navController: NavHostController) {
     val pagerState = rememberPagerState(pageCount = { post.postMediaUrls.count() })
     var showShimmer by remember { mutableStateOf(false) }
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRouteId by remember { derivedStateOf { currentBackStackEntry?.destination?.id ?: 0 } }
+
     Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.BottomCenter) {
         HorizontalPager(
             state = pagerState,
@@ -48,7 +53,7 @@ fun PostMedia(post: Post, navController: NavHostController) {
                     .clip(RoundedCornerShape(corner = CornerSize(16.dp)))
                     .clickable {
                         navController.navigate("PostImage/${post.id}") {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(currentRouteId) {
                                 saveState = true
                             }
                             launchSingleTop = true

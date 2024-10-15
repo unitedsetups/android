@@ -1,21 +1,29 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.Profile
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,78 +40,74 @@ import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
+import com.paraskcd.unitedsetups.presentation.components.ProfileHeader
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(navController: NavHostController) {
+fun Profile(navController: NavHostController, userId: String? = null) {
     val viewModel: ProfileViewModel = hiltViewModel()
     var user by remember { viewModel.user }
     var posts by remember { viewModel.posts }
     var loading by remember { viewModel.loading }
-    var showShimmerCover by remember { mutableStateOf(true) }
+    var stopFetching by remember { viewModel.stopFetching }
+    val pullRefreshState = rememberPullToRefreshState()
 
-    LaunchedEffect(Unit) {
-        viewModel.getPostsByUserId(null)
-        Log.d("User", user.toString())
+    LaunchedEffect(viewModel) {
+        if (userId == null) {
+            viewModel.getMyProfile()
+        } else {
+            viewModel.getUserById(userId)
+        }
+        if (user != null) {
+            viewModel.getPostsByUserId(user!!.id)
+        }
     }
 
-    LazyColumn {
-        item {
-            Box(contentAlignment = Alignment.BottomCenter) {
-                AsyncImage(
-                    model = Uri.parse("${Constants.BASE_URL}/${user?.coverImageUrl}"),
-                    contentDescription = "Cover Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(190.dp)
-                        .background(shimmerBrush(showShimmer = showShimmerCover, targetValue = 1300f)),
-                    onSuccess = { showShimmerCover = false },
-                    onLoading = { showShimmerCover = true }
-                )
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(190.dp)
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(DarkColorScheme.surface, Color.Transparent)
-                        )
-                    )
-                )
-                Column(modifier = Modifier
-                    .offset(y = 100.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    AsyncImage(
-                        model = Uri.parse("${Constants.BASE_URL}/${user?.profileImageUrl}"),
-                        contentDescription = "Cover Image",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(150.dp)
-                            .clip(CircleShape)
-                            .background(shimmerBrush(showShimmer = showShimmerCover, targetValue = 1300f))
-                            .shadow(elevation = 16.dp),
-                        onSuccess = { showShimmerCover = false },
-                        onLoading = { showShimmerCover = true }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(user?.name ?: "", fontSize = MaterialTheme.typography.bodyLarge.fontSize)
+    PullToRefreshBox(
+        modifier = Modifier
+            .fillMaxSize(),
+        isRefreshing = loading,
+        state = pullRefreshState,
+        onRefresh = {
+            if (user != null) {
+                viewModel.getPostsByUserId(user!!.id)
+            }
+        },
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = loading,
+                state = pullRefreshState,
+                containerColor = DarkColorScheme.surface,
+                color = DarkColorScheme.primary
+            )
+        }
+    ) {
+        LazyColumn {
+            item {
+                ProfileHeader(user)
+            }
+            item {
+                Spacer(modifier = Modifier.height(20.dp))
+            }
+            if (loading) {
+                item {
+                    PostSkeleton()
+                    PostSkeleton()
                 }
             }
-        }
-        item {
-            Spacer(modifier = Modifier.height(120.dp))
-        }
-        if (loading) {
-            item {
-                PostSkeleton()
-                PostSkeleton()
+            items(posts) { post ->
+                if (user != null) {
+                    PostItem(post, user!!.id, navController)
+                }
             }
-        }
-        items(posts) { post ->
-            if (user != null) {
-                PostItem(post, user!!.id, navController)
+            item {
+                LaunchedEffect(true) {
+                    if (!stopFetching) {
+                        viewModel.fetchMorePostsByUserId()
+                    }
+                }
             }
         }
     }

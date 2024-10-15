@@ -26,7 +26,7 @@ fun PostItem(post: Post, loggedInUserId: String, navController: NavHostControlle
             )
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        PostHeader(post, loggedInUserId)
+        PostHeader(post, loggedInUserId, navController)
         PostMedia(post, navController)
         PostFooter(post)
     }

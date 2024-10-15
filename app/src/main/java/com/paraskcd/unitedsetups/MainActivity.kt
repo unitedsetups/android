@@ -77,11 +77,6 @@ class MainActivity : ComponentActivity() {
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
             val homeViewModel: HomeViewModel = hiltViewModel()
 
-            LaunchedEffect(homeViewModel) {
-                homeViewModel.fetchPosts()
-                homeViewModel.getLoggedInUserId()
-            }
-
             val navController = rememberNavController()
             val topLevelRoutes = listOf(
                 TopLevelRoute("Home", "Home", Icons.Filled.Home),
@@ -93,6 +88,7 @@ class MainActivity : ComponentActivity() {
 
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
             val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "Home" } }
+            val currentRouteId by remember { derivedStateOf { currentBackStackEntry?.destination?.id } }
 
             UnitedSetupsTheme {
                 if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
@@ -101,26 +97,28 @@ class MainActivity : ComponentActivity() {
                         floatingActionButton = {
                             if (topLevelRoutes.any { it.route == currentRoute }
                                 && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
-                                FloatingActionButton(
-                                    onClick = { navController.navigate("NewPost") {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
-                                    } },
-                                    containerColor = DarkColorScheme.primary
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.EditNote,
-                                        contentDescription = "New Post"
-                                    )
+                                if (currentRouteId != null) {
+                                    FloatingActionButton(
+                                        onClick = { navController.navigate("NewPost") {
+                                            popUpTo(currentRouteId!!) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        } },
+                                        containerColor = DarkColorScheme.primary
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Filled.EditNote,
+                                            contentDescription = "New Post"
+                                        )
+                                    }
                                 }
                             }
                         },
                         topBar = {
                             AnimatedVisibility(
-                                visible = (topLevelRoutes.any { it.route == currentRoute }) == true,
+                                visible = (topLevelRoutes.any { currentRoute.contains(it.route) }) == true,
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
@@ -142,7 +140,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             AnimatedVisibility(
-                                visible = (topLevelRoutes.any { it.route == currentRoute }) == false && currentRoute == "NewPost",
+                                visible = (topLevelRoutes.any { currentRoute.contains(it.route) }) == false && currentRoute == "NewPost",
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
@@ -161,7 +159,7 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             AnimatedVisibility(
-                                visible = (topLevelRoutes.any { it.route == currentRoute }) == false && currentRoute.contains("PostImage"),
+                                visible = (topLevelRoutes.any { currentRoute.contains(it.route) }) == false && currentRoute.contains("PostImage"),
                                 enter = fadeIn(),
                                 exit = fadeOut()
                             ) {
@@ -182,7 +180,7 @@ class MainActivity : ComponentActivity() {
                         },
                         bottomBar = {
                             AnimatedVisibility(
-                                visible = (topLevelRoutes.any { it.route == currentRoute }) == true,
+                                visible = (topLevelRoutes.any { currentRoute.contains(it.route) }) == true,
                                 enter = expandVertically(expandFrom = Alignment.Top),
                                 exit = shrinkVertically(shrinkTowards = Alignment.Top)
                             ) {
@@ -195,7 +193,7 @@ class MainActivity : ComponentActivity() {
                                             colors = NavigationBarItemDefaults.colors(
                                                 indicatorColor = DarkColorScheme.background
                                             ),
-                                            selected = item.route == currentRoute,
+                                            selected = currentRoute.contains(item.route),
                                             label = {
                                                 Text(item.name)
                                             },
