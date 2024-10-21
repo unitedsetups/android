@@ -9,10 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ThumbDown
+import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.ThumbDown
 import androidx.compose.material.icons.outlined.ThumbUp
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,10 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paraskcd.unitedsetups.domain.model.Post
+import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import org.ocpsoft.prettytime.PrettyTime
 
 @Composable
-fun PostFooter(post: Post) {
+fun PostFooter(post: Post, likePost: (String, Boolean) -> Unit, postIdLoading: String?) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -42,22 +49,59 @@ fun PostFooter(post: Post) {
                     )
                     .padding(horizontal = 8.dp)
             ) {
-                IconButton(onClick = { /* TODO */ }, modifier = Modifier.padding(horizontal = 8.dp)) {
-                    Row {
-                        Icon(
-                            imageVector = Icons.Outlined.ThumbUp,
-                            contentDescription = "More",
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(post.upvotes.toString())
-                    }
+                if (post.id == postIdLoading) {
+                    CircularProgressIndicator(modifier = Modifier.padding(4.dp))
                 }
-                VerticalDivider()
-                IconButton(onClick = { /* TODO */ }) {
-                    Icon(
-                        imageVector = Icons.Outlined.ThumbDown,
-                        contentDescription = "More",
-                    )
+                else {
+                    Button(
+                        onClick = { likePost(post.id, true) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (post.liked) {
+                                Icon(
+                                    imageVector = Icons.Filled.ThumbUp,
+                                    contentDescription = "Like",
+                                    tint = DarkColorScheme.primary
+                                )
+                            }
+                            else {
+                                Icon(
+                                    imageVector = Icons.Outlined.ThumbUp,
+                                    contentDescription = "Like",
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(post.upvotes.toString())
+                        }
+                    }
+                    VerticalDivider()
+                    Button(
+                        onClick = { likePost(post.id, false) },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Row {
+                            if (post.disliked) {
+                                Icon(
+                                    imageVector = Icons.Filled.ThumbDown,
+                                    contentDescription = "Dislike",
+                                    tint = DarkColorScheme.primary
+                                )
+                            }
+                            else {
+                                Icon(
+                                    imageVector = Icons.Outlined.ThumbDown,
+                                    contentDescription = "Dislike",
+                                )
+                            }
+                        }
+                    }
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))

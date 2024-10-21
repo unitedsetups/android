@@ -51,16 +51,12 @@ fun Profile(navController: NavHostController, userId: String? = null) {
     var posts by remember { viewModel.posts }
     var loading by remember { viewModel.loading }
     var stopFetching by remember { viewModel.stopFetching }
+    val postIdLoading by remember { viewModel.postIdLoading }
     val pullRefreshState = rememberPullToRefreshState()
 
     LaunchedEffect(viewModel) {
         if (userId == null) {
             viewModel.getMyProfile()
-        } else {
-            viewModel.getUserById(userId)
-        }
-        if (user != null) {
-            viewModel.getPostsByUserId(user!!.id)
         }
     }
 
@@ -70,6 +66,7 @@ fun Profile(navController: NavHostController, userId: String? = null) {
         isRefreshing = loading,
         state = pullRefreshState,
         onRefresh = {
+            viewModel.startFetching()
             if (user != null) {
                 viewModel.getPostsByUserId(user!!.id)
             }
@@ -89,7 +86,7 @@ fun Profile(navController: NavHostController, userId: String? = null) {
                 ProfileHeader(user)
             }
             item {
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
             }
             if (loading) {
                 item {
@@ -99,10 +96,16 @@ fun Profile(navController: NavHostController, userId: String? = null) {
             }
             items(posts) { post ->
                 if (user != null) {
-                    PostItem(post, user!!.id, navController)
+                    PostItem(
+                        post,
+                        user!!.id,
+                        navController,
+                        postIdLoading
+                    ) { postId, isLiked -> viewModel.likePost(postId, isLiked) }
                 }
             }
             item {
+                Spacer(modifier = Modifier.height(24.dp))
                 LaunchedEffect(true) {
                     if (!stopFetching) {
                         viewModel.fetchMorePostsByUserId()

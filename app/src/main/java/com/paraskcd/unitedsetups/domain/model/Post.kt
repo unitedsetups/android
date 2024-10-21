@@ -7,11 +7,13 @@ data class Post(
     val text: String,
     val createdDateTime: LocalDateTime,
     val updatedDateTime: LocalDateTime,
-    val upvotes: Int,
+    var upvotes: Int,
     val clicks: Int,
     val deviceId: String,
     val postMediaUrls: List<PostMediaUrl>,
-    val postedBy: PostedBy
+    val postedBy: PostedBy,
+    var liked: Boolean,
+    var disliked: Boolean
 )
 
 data class PostedBy(

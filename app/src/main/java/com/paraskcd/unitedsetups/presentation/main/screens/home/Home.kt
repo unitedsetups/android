@@ -1,6 +1,8 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.home
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -14,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
@@ -31,6 +34,7 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
         viewModel.scrollOffset.value
     )
     val pullRefreshState = rememberPullToRefreshState()
+    val postIdLoading by remember { viewModel.postIdLoading }
 
     // after each scroll, update values in ViewModel
     LaunchedEffect(key1 = listState.isScrollInProgress) {
@@ -45,7 +49,10 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
             .fillMaxSize(),
         isRefreshing = loading,
         state = pullRefreshState,
-        onRefresh = { viewModel.fetchPosts() },
+        onRefresh = {
+            viewModel.startFetching()
+            viewModel.fetchPosts()
+        },
         indicator = {
             Indicator(
                 modifier = Modifier.align(Alignment.TopCenter),
@@ -59,16 +66,22 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
         LazyColumn(
             state = listState
         ) {
-            if (loading) {
-                item {
-                    PostSkeleton()
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                if (loading) {
                     PostSkeleton()
                 }
             }
             items(posts) { post ->
-                PostItem(post, loggedInUserId, navController)
+                PostItem(
+                    post,
+                    loggedInUserId,
+                    navController,
+                    postIdLoading
+                ) { postId, isLiked -> viewModel.likePost(postId, isLiked) }
             }
             item {
+                Spacer(modifier = Modifier.height(24.dp))
                 LaunchedEffect(true) {
                     if (!stopFetching) {
                         viewModel.fetchMorePosts()

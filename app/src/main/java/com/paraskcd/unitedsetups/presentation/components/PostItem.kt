@@ -14,7 +14,13 @@ import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostItem(post: Post, loggedInUserId: String, navController: NavHostController) {
+fun PostItem(
+    post: Post,
+    loggedInUserId: String,
+    navController: NavHostController,
+    postIdLoading: String?,
+    likePost: (String, Boolean) -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -28,6 +34,6 @@ fun PostItem(post: Post, loggedInUserId: String, navController: NavHostControlle
     ) {
         PostHeader(post, loggedInUserId, navController)
         PostMedia(post, navController)
-        PostFooter(post)
+        PostFooter(post, likePost, postIdLoading)
     }
 }

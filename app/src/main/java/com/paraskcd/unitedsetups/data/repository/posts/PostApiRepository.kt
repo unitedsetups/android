@@ -39,4 +39,22 @@ class PostApiRepository @Inject constructor(private val postApi: IPostApi) : IPo
             DataOrException(null, ex)
         }
     }
+
+    override suspend fun likePost(postId: String): DataOrException<Post, Exception> {
+        return try {
+            DataOrException(postApi.likePost(postId).toPost(), null)
+        } catch (ex: Exception) {
+            Log.e("likePost", ex.message.toString())
+            DataOrException(null, ex)
+        }
+    }
+
+    override suspend fun dislikePost(postId: String): DataOrException<Post, Exception> {
+        return try {
+            DataOrException(postApi.dislikePost(postId).toPost(), null)
+        } catch (ex: Exception) {
+            Log.e("dislikePost", ex.message.toString())
+            DataOrException(null, ex)
+        }
+    }
 }

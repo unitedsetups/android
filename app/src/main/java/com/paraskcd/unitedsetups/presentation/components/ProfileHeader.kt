@@ -43,9 +43,9 @@ fun ProfileHeader(user: User?) {
     Box(
         contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
-            .shadow(16.dp)
+            .shadow(elevation = 16.dp, shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
             .fillMaxWidth()
-            .background(DarkColorScheme.surface, shape = RoundedCornerShape(16.dp))
+            .background(DarkColorScheme.surface, shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
             .padding(bottom = 150.dp)
     ) {
         if (user?.coverImageUrl?.isNotEmpty() == true) {
@@ -56,7 +56,7 @@ fun ProfileHeader(user: User?) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(190.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                     .background(shimmerBrush(showShimmer = showShimmerCover, targetValue = 1300f)),
                 onSuccess = { showShimmerCover = false },
                 onLoading = { showShimmerCover = true }
@@ -65,7 +65,7 @@ fun ProfileHeader(user: User?) {
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .height(190.dp)
-                .background(DarkColorScheme.background, shape = RoundedCornerShape(16.dp))
+                .background(DarkColorScheme.background, shape = RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
             )
         }
         Box(modifier = Modifier
@@ -88,7 +88,7 @@ fun ProfileHeader(user: User?) {
                     contentScale = ContentScale.Fit,
                     modifier = Modifier
                         .size(150.dp)
-                        .shadow(elevation = if (!showShimmerCover) 16.dp else 0.dp)
+                        .shadow(elevation = if (!showShimmerCover) 16.dp else 0.dp, shape = CircleShape)
                         .clip(CircleShape)
                         .background(
                             shimmerBrush(showShimmer = showShimmerCover, targetValue = 1300f),
@@ -100,7 +100,7 @@ fun ProfileHeader(user: User?) {
             } else {
                 Box(modifier = Modifier
                     .size(150.dp)
-                    .shadow(16.dp)
+                    .shadow(elevation = 16.dp, shape = CircleShape)
                     .background(DarkColorScheme.background, shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {

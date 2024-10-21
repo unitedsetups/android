@@ -1,5 +1,6 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.Profile
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,7 +25,11 @@ class ProfileViewModel @Inject constructor(
     val loading = mutableStateOf(false)
     var pageIndex = mutableStateOf(0)
     var stopFetching = mutableStateOf(false)
+    var postIdLoading: MutableState<String?> = mutableStateOf(null)
 
+    fun startFetching() {
+        stopFetching.value = false
+    }
 
     suspend fun getUserById(userId: String) {
         val result = userApiRepository.getUserById(userId)
@@ -63,6 +68,28 @@ class ProfileViewModel @Inject constructor(
             } else {
                 stopFetching.value = true
             }
+        }
+    }
+
+    fun likePost(postId: String, isLiked: Boolean) {
+        viewModelScope.launch {
+            postIdLoading.value = postId
+            var post: Post? = null
+            if (isLiked) {
+                val postResponse = postApiRepository.likePost(postId)
+                post = postResponse.data
+            } else {
+                val postResponse = postApiRepository.dislikePost(postId)
+                post = postResponse.data
+            }
+
+            if (post != null) {
+                posts.value.find { it.id == postId }?.liked = post.liked
+                posts.value.find { it.id == postId }?.disliked = post.disliked
+                posts.value.find { it.id == postId }?.upvotes = post.upvotes
+            }
+
+            postIdLoading.value = null
         }
     }
 }

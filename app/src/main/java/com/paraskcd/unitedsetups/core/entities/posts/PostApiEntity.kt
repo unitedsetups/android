@@ -18,6 +18,8 @@ data class PostApiEntity(
     val postMediaUrls: List<PostMediaUrlResponse>,
     val postedById: String,
     val postedBy: PostedByResponse,
+    val liked: Boolean,
+    val disliked: Boolean
 )
 
 data class PostMediaUrlResponse(
@@ -52,7 +54,9 @@ fun PostApiEntity.toPost(): Post {
         clicks,
         deviceId ?: "",
         postMediaUrls.map { it.toPostMediaUrl() },
-        postedBy.toPostedBy(postedById)
+        postedBy.toPostedBy(postedById),
+        liked,
+        disliked
     )
 }
 
