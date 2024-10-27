@@ -29,7 +29,7 @@ fun PostThreadItem(
     postThreadIdLoading: String?,
     isChild: Boolean,
     likePostThread: (String, Boolean) -> Unit,
-    activateReply: (String) -> Unit
+    activateReply: (PostThread) -> Unit
 ) {
     fun getShape(): Shape {
         if (postData.postThreads.size == 1) {
@@ -54,25 +54,34 @@ fun PostThreadItem(
 
     fun getExtraPadding(): Dp {
         if (isChild) {
-            return 16.dp
+            return 2.dp
         } else {
             return 0.dp
         }
     }
+
+    fun firstPadding(): Dp {
+        if (isChild) {
+            return 0.dp
+        } else {
+            return 16.dp
+        }
+    }
+
     Column(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = firstPadding())
             .fillMaxWidth()
             .shadow(elevation = 16.dp)
             .background(
                 DarkColorScheme.surface,
                 shape = getShape()
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(start = 16.dp, top = 16.dp)
             .padding(start = getExtraPadding())
             .drawBehind {
                 if (isChild) {
-                    val strokeWidth = 1 * density
+                    val strokeWidth = 2 * density
                     //Draw line function for left border
                     drawLine(
                         Color.DarkGray,
@@ -83,11 +92,24 @@ fun PostThreadItem(
                 }
             }
     ) {
-        Column(modifier = Modifier.padding(horizontal = 8.dp)) {
+        Column(modifier = Modifier.padding(start = 8.dp)) {
             PostThreadHeader(postThread, navController, currentRoute)
             PostThreadMedia(postThread)
             PostThreadFooter(postThread, postData, likePostThread, postThreadIdLoading, activateReply)
         }
-
+        if (postThread.childrenPostThreads.isNotEmpty()) {
+            postThread.childrenPostThreads.forEach { childPostThread ->
+                PostThreadItem(
+                    childPostThread,
+                    postData,
+                    navController,
+                    currentRoute,
+                    postThreadIdLoading,
+                    true,
+                    likePostThread,
+                    activateReply
+                )
+            }
+        }
     }
 }

@@ -44,13 +44,13 @@ fun PostApiEntity.toPost(): Post {
         LocalDateTime.parse(
             createdDateTime,
             DateTimeFormatter
-                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S'Z'")
                 .withResolverStyle(ResolverStyle.LENIENT)
         ),
         LocalDateTime.parse(
             updatedDateTime,
             DateTimeFormatter
-                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S'Z'")
                 .withResolverStyle(ResolverStyle.LENIENT)
         ),
         upvotes,

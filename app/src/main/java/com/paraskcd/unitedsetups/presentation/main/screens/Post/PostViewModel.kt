@@ -37,7 +37,7 @@ class PostViewModel @Inject constructor(
     val postThreadIdLoading: MutableState<String?> = mutableStateOf(null)
     var text by mutableStateOf("")
         private set
-    val replyParentPostThreadId: MutableState<String?> = mutableStateOf(null)
+    val replyParentPostThread: MutableState<PostThread?> = mutableStateOf(null)
 
     fun updateText(input: String) {
         text = input
@@ -88,15 +88,29 @@ class PostViewModel @Inject constructor(
             }
 
             postThread?.let { postThread ->
-                post.value?.let { postData ->
-                    postData.postThreads.find { it.id == postThreadId }?.liked = postThread.liked
-                    postData.postThreads.find { it.id == postThreadId }?.disliked = postThread.disliked
-                    postData.postThreads.find { it.id == postThreadId }?.upvotes = postThread.upvotes
+                getPostThread(postThread)?.let {
+                    it.liked = postThread.liked
+                    it.disliked = postThread.disliked
+                    it.upvotes = postThread.upvotes
                 }
             }
 
             postThreadIdLoading.value = null
         }
+    }
+
+    fun getPostThread(postThread: PostThread): PostThread? {
+        var pt = post.value?.postThreads?.find { it.id == postThread.id }
+        pt?.let {
+            pt = post.value?.postThreads?.find { it.id == postThread.parentPostThreadId }?.childrenPostThreads?.find { it.id == postThread.id }
+            pt?.let {
+                post.value?.postThreads?.forEach {
+                    it.childrenPostThreads.find { it.id == postThread.parentPostThreadId }?.childrenPostThreads?.find { it.id == postThread.id }
+                }
+            }
+        }
+
+        return pt
     }
 
     suspend fun uploadMedia(): List<Upload> {
@@ -122,18 +136,16 @@ class PostViewModel @Inject constructor(
                 val postResult = postThreadApiRepository.createNewPostThread(
                     CreateNewPostThreadRequest(
                         it.id,
-                        replyParentPostThreadId.value,
+                        replyParentPostThread.value?.id,
                         text,
                         uploadResult.map { PostMediaUrlRequest(it.paths, it.thumbnails) }
                     )
                 )
                 postResult.data?.let { data ->
-                    var postThreadList = listOf<PostThread>(data)
-                    it.postThreads = postThreadList.plus(it.postThreads)
-                    loading.value = false
+                    getPostById(post.value!!.id)
                     text = ""
                     selectedImages.value = emptyList()
-                    replyParentPostThreadId.value = null
+                    replyParentPostThread.value = null
                 } ?: {
                     postResult.ex?.let { ex ->
                         throw ex
@@ -154,5 +166,9 @@ class PostViewModel @Inject constructor(
             type = "text/plain"
         }
         return Intent.createChooser(sendIntent, null)
+    }
+
+    fun getReplyPostThread(postThread: PostThread) {
+        replyParentPostThread.value = postThread
     }
 }

@@ -28,7 +28,7 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import org.ocpsoft.prettytime.PrettyTime
 
 @Composable
-fun PostThreadFooter(postThread: PostThread, postData: Post, likePost: (String, Boolean) -> Unit, postThreadIdLoading: String?, activateReply: (String) -> Unit) {
+fun PostThreadFooter(postThread: PostThread, postData: Post, likePost: (String, Boolean) -> Unit, postThreadIdLoading: String?, activateReply: (PostThread) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -70,7 +70,7 @@ fun PostThreadFooter(postThread: PostThread, postData: Post, likePost: (String, 
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton({ activateReply(postThread.id) }) {
+            IconButton({ activateReply(postThread) }) {
                 Icon(
                     imageVector = Icons.Outlined.Forum,
                     contentDescription = "More",

@@ -71,7 +71,7 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
     val currentRoute by remember { derivedStateOf { currentBackStackEntry?.destination?.route ?: "Home" } }
     val localDensity = LocalDensity.current
     val localContext = LocalContext.current
-    val replyPostThreadId by remember { viewModel.replyParentPostThreadId }
+    val replyPostThread by remember { viewModel.replyParentPostThread }
 
     LaunchedEffect(postId) {
         viewModel.getPostById(postId)
@@ -148,23 +148,8 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                         postThreadIdLoading,
                         false,
                         { postThreadId, isLiked -> viewModel.likePostThread(isLiked, postThreadId) },
-                        { postThreadId -> viewModel.replyParentPostThreadId.value = postThreadId }
+                        { postThread -> viewModel.getReplyPostThread(postThread) }
                     )
-
-                    if (postThread.childrenPostThreads.isNotEmpty()) {
-                        postThread.childrenPostThreads.forEach { childPostThread ->
-                            PostThreadItem(
-                                childPostThread,
-                                postData,
-                                navController,
-                                currentRoute,
-                                postThreadIdLoading,
-                                true,
-                                { postThreadId, isLiked -> viewModel.likePostThread(isLiked, postThreadId) },
-                                { postThreadId -> viewModel.replyParentPostThreadId.value = postThreadId }
-                            )
-                        }
-                    }
                 }
                 item {
                     Spacer(modifier = Modifier.height(columnHeightDp.plus(16.dp)))
@@ -184,33 +169,31 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                     }
                     .safeDrawingPadding()
             ) {
-                replyPostThreadId?.let { postThreadId ->
-                    post?.postThreads?.find { it.id == postThreadId }?.let { postThread ->
-                        Row (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .background(
-                                    color = Color.White.copy(alpha = 0.05f),
-                                    shape = RoundedCornerShape(16.dp)
-                                ),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                replyPostThread?.let { postThread ->
+                    Row (
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .background(
+                                color = Color.White.copy(alpha = 0.05f),
+                                shape = RoundedCornerShape(16.dp)
+                            ),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(horizontal = 8.dp)
-                            ) {
-                                Icon(imageVector = Icons.Outlined.Forum, contentDescription = "Image")
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Column {
-                                    Text("Reply to:")
-                                    Text("${postThread.postedBy.username}: ${postThread.text}")
-                                }
+                            Icon(imageVector = Icons.Outlined.Forum, contentDescription = "Image")
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column {
+                                Text("Reply to:")
+                                Text("${postThread.postedBy.username}: ${postThread.text}")
                             }
-                            IconButton(onClick = { viewModel.replyParentPostThreadId.value = null }) {
-                                Icon(imageVector = Icons.Filled.Close, contentDescription = "Image")
-                            }
+                        }
+                        IconButton(onClick = { viewModel.replyParentPostThread.value = null }) {
+                            Icon(imageVector = Icons.Filled.Close, contentDescription = "Image")
                         }
                     }
                 }
