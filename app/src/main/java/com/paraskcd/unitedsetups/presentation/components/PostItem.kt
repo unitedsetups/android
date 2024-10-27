@@ -1,6 +1,7 @@
 package com.paraskcd.unitedsetups.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,10 +17,11 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 @Composable
 fun PostItem(
     post: Post,
-    loggedInUserId: String,
+    loggedInUserId: String?,
     navController: NavHostController,
     postIdLoading: String?,
-    likePost: (String, Boolean) -> Unit
+    likePost: (String, Boolean) -> Unit,
+    sharePost: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -31,9 +33,12 @@ fun PostItem(
                 shape = RoundedCornerShape(16.dp)
             )
             .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable {
+                navController.navigate("Post/${post.id}")
+            }
     ) {
         PostHeader(post, loggedInUserId, navController)
         PostMedia(post, navController)
-        PostFooter(post, likePost, postIdLoading)
+        PostFooter(post, likePost, postIdLoading, navController, sharePost)
     }
 }

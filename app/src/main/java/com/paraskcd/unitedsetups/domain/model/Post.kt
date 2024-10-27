@@ -9,8 +9,9 @@ data class Post(
     val updatedDateTime: LocalDateTime,
     var upvotes: Int,
     val clicks: Int,
-    val deviceId: String,
+    val deviceId: String?,
     val postMediaUrls: List<PostMediaUrl>,
+    var postThreads: List<PostThread>,
     val postedBy: PostedBy,
     var liked: Boolean,
     var disliked: Boolean

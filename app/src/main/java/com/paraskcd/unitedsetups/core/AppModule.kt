@@ -6,14 +6,17 @@ import com.paraskcd.unitedsetups.core.common.Constants
 import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.apis.IAuthApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IPostApi
+import com.paraskcd.unitedsetups.core.interfaces.apis.IPostThreadApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IUploadApi
 import com.paraskcd.unitedsetups.core.interfaces.apis.IUserApi
 import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
+import com.paraskcd.unitedsetups.core.interfaces.repository.IPostThreadApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IUploadApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IUserApiRepository
 import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
 import com.paraskcd.unitedsetups.data.repository.posts.PostApiRepository
+import com.paraskcd.unitedsetups.data.repository.postthreads.PostThreadsApiRepository
 import com.paraskcd.unitedsetups.data.repository.upload.UploadApiRepository
 import com.paraskcd.unitedsetups.data.repository.users.UserApiRepository
 import dagger.Module
@@ -128,5 +131,25 @@ object AppModule {
     @Provides
     fun providesUserRepository(userApi: IUserApi): IUserApiRepository {
         return UserApiRepository(userApi)
+    }
+
+    @Singleton
+    @Provides
+    fun providesPostThreadsApi(okHttpClient: OkHttpClient): IPostThreadApi {
+        return Retrofit
+            .Builder()
+            .baseUrl(Constants.API)
+            .client(okHttpClient)
+            .addConverterFactory(
+                GsonConverterFactory.create()
+            )
+            .build()
+            .create(IPostThreadApi::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun providesPostThreadsApiRepository(postThreadApi: IPostThreadApi): IPostThreadApiRepository {
+        return PostThreadsApiRepository(postThreadApi)
     }
 }

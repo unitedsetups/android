@@ -50,7 +50,7 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostHeader(post: Post, loggedInUserId: String, navController: NavHostController) {
+fun PostHeader(post: Post, loggedInUserId: String?, navController: NavHostController) {
     var menuExpanded by remember {
         mutableStateOf(false)
     }

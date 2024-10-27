@@ -29,12 +29,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import org.ocpsoft.prettytime.PrettyTime
 
 @Composable
-fun PostFooter(post: Post, likePost: (String, Boolean) -> Unit, postIdLoading: String?) {
+fun PostFooter(post: Post, likePost: (String, Boolean) -> Unit, postIdLoading: String?, navController: NavHostController, sharePost: (String) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -106,7 +107,7 @@ fun PostFooter(post: Post, likePost: (String, Boolean) -> Unit, postIdLoading: S
             }
             Spacer(modifier = Modifier.width(8.dp))
             IconButton(
-                onClick = { /* TODO */ },
+                onClick = { navController.navigate("Post/${post.id}") },
                 modifier = Modifier
                     .background(
                         color = Color.White.copy(alpha = 0.05f),
@@ -121,7 +122,7 @@ fun PostFooter(post: Post, likePost: (String, Boolean) -> Unit, postIdLoading: S
             }
         }
         IconButton(
-            onClick = { /* TODO */ },
+            onClick = { sharePost(post.id) },
             modifier = Modifier
                 .background(
                     color = Color.White.copy(alpha = 0.05f),

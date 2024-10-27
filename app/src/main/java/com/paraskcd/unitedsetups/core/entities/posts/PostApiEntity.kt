@@ -1,5 +1,7 @@
 package com.paraskcd.unitedsetups.core.entities.posts
 
+import com.paraskcd.unitedsetups.core.entities.postthreads.PostThreadApiEntity
+import com.paraskcd.unitedsetups.core.entities.postthreads.toPostThread
 import com.paraskcd.unitedsetups.domain.model.Post
 import com.paraskcd.unitedsetups.domain.model.PostMediaUrl
 import com.paraskcd.unitedsetups.domain.model.PostedBy
@@ -16,6 +18,7 @@ data class PostApiEntity(
     val clicks: Int,
     val deviceId: String?,
     val postMediaUrls: List<PostMediaUrlResponse>,
+    val postThreads: List<PostThreadApiEntity>,
     val postedById: String,
     val postedBy: PostedByResponse,
     val liked: Boolean,
@@ -41,19 +44,20 @@ fun PostApiEntity.toPost(): Post {
         LocalDateTime.parse(
             createdDateTime,
             DateTimeFormatter
-                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
                 .withResolverStyle(ResolverStyle.LENIENT)
         ),
         LocalDateTime.parse(
             updatedDateTime,
             DateTimeFormatter
-                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS'Z'")
+                .ofPattern("yyyy-MM-dd'T'HH:mm:ss.S")
                 .withResolverStyle(ResolverStyle.LENIENT)
         ),
         upvotes,
         clicks,
         deviceId ?: "",
         postMediaUrls.map { it.toPostMediaUrl() },
+        postThreads.map { it.toPostThread() },
         postedBy.toPostedBy(postedById),
         liked,
         disliked

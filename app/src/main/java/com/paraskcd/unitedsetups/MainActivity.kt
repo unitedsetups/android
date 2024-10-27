@@ -1,17 +1,14 @@
 package com.paraskcd.unitedsetups
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +50,7 @@ import com.paraskcd.unitedsetups.core.common.TopLevelRoute
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationView
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationViewModel
 import com.paraskcd.unitedsetups.presentation.main.MainView
+import com.paraskcd.unitedsetups.presentation.main.screens.Post.PostViewModel
 import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import com.paraskcd.unitedsetups.ui.theme.UnitedSetupsTheme
@@ -76,6 +73,7 @@ class MainActivity : ComponentActivity() {
             val mainViewModel: MainActivityViewModel = hiltViewModel()
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
             val homeViewModel: HomeViewModel = hiltViewModel()
+            val postViewModel: PostViewModel = hiltViewModel()
 
             val navController = rememberNavController()
             val topLevelRoutes = listOf(
@@ -177,6 +175,25 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
+                            AnimatedVisibility(
+                                visible = (topLevelRoutes.any { currentRoute.contains(it.route) }) == false && currentRoute.contains("Post") && !currentRoute.contains("PostImage"),
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                TopAppBar(
+                                    title = {
+                                        Text("Comments")
+                                    },
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = DarkColorScheme.surface
+                                    ),
+                                    navigationIcon = {
+                                        IconButton(onClick = { navController.popBackStack() }) {
+                                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        }
+                                    }
+                                )
+                            }
                         },
                         bottomBar = {
                             AnimatedVisibility(
@@ -186,7 +203,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 NavigationBar(
                                     containerColor = DarkColorScheme.surface,
-                                    contentColor = DarkColorScheme.background
+                                    contentColor = DarkColorScheme.background,
                                 ) {
                                     topLevelRoutes.forEachIndexed { index, item ->
                                         NavigationBarItem(
@@ -219,7 +236,8 @@ class MainActivity : ComponentActivity() {
                         MainView(
                             modifier = Modifier.padding(innerPadding),
                             navController = navController,
-                            homeViewModel = homeViewModel
+                            homeViewModel = homeViewModel,
+                            postViewModel = postViewModel
                         )
                     }
                 } else {

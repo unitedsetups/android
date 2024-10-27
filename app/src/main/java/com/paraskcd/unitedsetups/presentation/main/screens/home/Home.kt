@@ -16,7 +16,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
@@ -35,6 +37,7 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
     )
     val pullRefreshState = rememberPullToRefreshState()
     val postIdLoading by remember { viewModel.postIdLoading }
+    val localContext = LocalContext.current
 
     // after each scroll, update values in ViewModel
     LaunchedEffect(key1 = listState.isScrollInProgress) {
@@ -77,8 +80,10 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
                     post,
                     loggedInUserId,
                     navController,
-                    postIdLoading
-                ) { postId, isLiked -> viewModel.likePost(postId, isLiked) }
+                    postIdLoading,
+                    { postId, isLiked -> viewModel.likePost(postId, isLiked) },
+                    { postId -> startActivity(localContext, viewModel.share(postId), null) }
+                )
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))

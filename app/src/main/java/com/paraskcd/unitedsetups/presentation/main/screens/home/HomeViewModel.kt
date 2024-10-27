@@ -1,5 +1,6 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.home
 
+import android.content.Intent
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
@@ -85,5 +86,16 @@ class HomeViewModel @Inject constructor(
 
             postIdLoading.value = null
         }
+    }
+
+    fun share(postId: String): Intent {
+        val post = posts.value.find { it.id == postId }
+        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_TITLE, "United Setups")
+            putExtra(Intent.EXTRA_TEXT, "${post?.postMediaUrls[0]?.path}")
+            putExtra(Intent.EXTRA_TEXT, "User ${post?.postedBy?.username}  posted this Amazing Setup in United Setups, check it out.")
+            type = "text/plain"
+        }
+        return Intent.createChooser(sendIntent, null)
     }
 }

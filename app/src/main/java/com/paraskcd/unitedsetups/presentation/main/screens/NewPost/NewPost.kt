@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -190,7 +191,7 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(DarkColorScheme.surface)
+                        .background(DarkColorScheme.surface, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                         .safeDrawingPadding(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {

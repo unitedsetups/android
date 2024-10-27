@@ -24,35 +24,42 @@ class NewPostViewModel @Inject constructor(
 
     suspend fun uploadMedia(): List<Upload> {
         val result = uploadApiRepository.uploadPostMedia(selectedImages.value)
-        if (result.data != null) {
-            Log.d("uploadMedia", "Media uploaded successfully: ${result.data}")
-            return result.data!!
-        } else {
-            Log.d("uploadMedia", "Media upload failed: ${result.ex}")
-            throw result.ex!!
+        result.data?.let { data ->
+            return data
+        } ?: {
+            result.ex?.let { ex ->
+                throw ex
+            }
         }
+        return emptyList()
     }
 
     suspend fun createPost(): Post? {
         try {
             loading.value = true
             val uploadResult = uploadMedia()
-            val postResult = postApiRepository.createNewPost(
-                CreateNewPostRequest(
-                    postText.value,
-                    uploadResult.map { PostMediaUrlRequest(it.paths, it.thumbnails) }
-                )
-            )
-            if (postResult.data != null) {
-                loading.value = false
-                return postResult.data!!
-            } else {
-                throw postResult.ex!!
+            uploadResult.isNotEmpty().let { notEmpty ->
+                if (notEmpty) {
+                    val postResult = postApiRepository.createNewPost(
+                        CreateNewPostRequest(
+                            postText.value,
+                            uploadResult.map { PostMediaUrlRequest(it.paths, it.thumbnails) }
+                        )
+                    )
+                    postResult.data?.let { data ->
+                        return data
+                    } ?: {
+                        postResult.ex?.let { ex ->
+                            throw ex
+                        }
+                    }
+                }
             }
+            return null
         } catch (e: Exception) {
             loading.value = false
             Log.d("createPost", "Post Create failed: ${e.localizedMessage}")
-            return null;
+            return null
         }
     }
 }
