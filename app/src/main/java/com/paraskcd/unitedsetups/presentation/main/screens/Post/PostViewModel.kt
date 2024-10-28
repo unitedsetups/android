@@ -88,29 +88,11 @@ class PostViewModel @Inject constructor(
             }
 
             postThread?.let { postThread ->
-                getPostThread(postThread)?.let {
-                    it.liked = postThread.liked
-                    it.disliked = postThread.disliked
-                    it.upvotes = postThread.upvotes
-                }
+                getPostById(post.value!!.id)
             }
 
             postThreadIdLoading.value = null
         }
-    }
-
-    fun getPostThread(postThread: PostThread): PostThread? {
-        var pt = post.value?.postThreads?.find { it.id == postThread.id }
-        pt?.let {
-            pt = post.value?.postThreads?.find { it.id == postThread.parentPostThreadId }?.childrenPostThreads?.find { it.id == postThread.id }
-            pt?.let {
-                post.value?.postThreads?.forEach {
-                    it.childrenPostThreads.find { it.id == postThread.parentPostThreadId }?.childrenPostThreads?.find { it.id == postThread.id }
-                }
-            }
-        }
-
-        return pt
     }
 
     suspend fun uploadMedia(): List<Upload> {
