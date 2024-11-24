@@ -1,6 +1,9 @@
 package com.paraskcd.unitedsetups.ui.theme
 
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RippleConfiguration
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -32,3 +35,14 @@ fun UnitedSetupsTheme(
         content = content
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+val NoRippleConfiguration =
+    RippleConfiguration(
+        color = Color.Transparent, rippleAlpha = RippleAlpha(
+            draggedAlpha = 0f,
+            focusedAlpha = 0f,
+            hoveredAlpha = 0f,
+            pressedAlpha = 0f
+        )
+    )
