@@ -1,5 +1,6 @@
 package com.paraskcd.unitedsetups.presentation.authentication
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,10 @@ fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: A
     var register by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
+
+    BackHandler(enabled = register) {
+        register = false
+    }
 
     Box(modifier = Modifier.fillMaxSize().background(DarkColorScheme.background)) {
         Image(
