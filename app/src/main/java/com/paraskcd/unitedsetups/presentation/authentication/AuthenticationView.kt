@@ -1,10 +1,10 @@
 package com.paraskcd.unitedsetups.presentation.authentication
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,14 +40,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import com.paraskcd.unitedsetups.presentation.components.EmailTextField
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.paraskcd.unitedsetups.R
+import com.paraskcd.unitedsetups.presentation.components.EmailTextField
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import com.paraskcd.unitedsetups.ui.theme.NoRippleConfiguration
 import kotlinx.coroutines.launch
@@ -54,6 +56,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: AuthenticationViewModel) {
+    val context = LocalContext.current
     var register by remember { mutableStateOf(false) }
     var showPassword by remember { mutableStateOf(false) }
     val composableScope = rememberCoroutineScope()
@@ -205,6 +208,12 @@ fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: A
                                 val error = authenticationViewModel.register()
                                 if (error == null) {
                                     register = false
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        error.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             } else {
                                 authenticationViewModel.login()
@@ -251,6 +260,17 @@ fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: A
                     }
                 }
             }
+        }
+    }
+
+    if (authenticationViewModel.isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
         }
     }
 }
