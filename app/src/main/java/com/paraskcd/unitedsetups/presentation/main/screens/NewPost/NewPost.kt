@@ -1,5 +1,6 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.NewPost
 
+import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -11,9 +12,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,27 +23,24 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,7 +48,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -63,7 +60,6 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
     val newPostViewModel: NewPostViewModel = hiltViewModel()
@@ -101,7 +97,14 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
         focusRequester.requestFocus()
     }
 
+    val window = (LocalView.current.context as Activity).window
+    val navbarColor = DarkColorScheme.surface.toArgb()
+
     if (loading) {
+        SideEffect {
+            window.navigationBarColor = Color.Transparent.toArgb()
+        }
+
         Box(modifier = Modifier.fillMaxSize().background(DarkColorScheme.background), contentAlignment = Alignment.Center) {
             Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(
@@ -115,6 +118,14 @@ fun NewPost(navController: NavHostController, modifier: Modifier = Modifier) {
             }
         }
     } else {
+        DisposableEffect(Unit) {
+            window.navigationBarColor = navbarColor
+
+            onDispose {
+                window.navigationBarColor = Color.Transparent.toArgb()
+            }
+        }
+
         Column(
             modifier = modifier
                 .fillMaxSize(),
