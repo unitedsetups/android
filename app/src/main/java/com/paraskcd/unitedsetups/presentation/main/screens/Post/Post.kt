@@ -1,5 +1,6 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.Post
 
+import android.app.Activity
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -50,9 +51,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.core.content.ContextCompat.startActivity
 import com.paraskcd.unitedsetups.presentation.components.PostThreadItem
 
@@ -72,6 +75,9 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
     val localDensity = LocalDensity.current
     val localContext = LocalContext.current
     val replyPostThread by remember { viewModel.replyParentPostThread }
+
+    val window = (LocalView.current.context as Activity).window
+    val navbarColor = DarkColorScheme.surface.toArgb()
 
     LaunchedEffect(postId) {
         viewModel.getPostById(postId)
@@ -121,6 +127,13 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
         },
         contentAlignment = Alignment.BottomCenter
     ) {
+        DisposableEffect(Unit) {
+            window.navigationBarColor = navbarColor
+
+            onDispose {
+                window.navigationBarColor = Color.Transparent.toArgb()
+            }
+        }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -162,12 +175,12 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
             exit = shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .background(DarkColorScheme.surface, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                     .onGloballyPositioned { coordinates ->
                         columnHeightDp = with(localDensity) { coordinates.size.height.toDp() }
                     }
-                    .safeDrawingPadding()
             ) {
                 replyPostThread?.let { postThread ->
                     Row (
@@ -211,6 +224,7 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                         disabledIndicatorColor = Color.Transparent,
                         errorIndicatorColor = DarkColorScheme.error
                     ),
+                    maxLines = 22,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
