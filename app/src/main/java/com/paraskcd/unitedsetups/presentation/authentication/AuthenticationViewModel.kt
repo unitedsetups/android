@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.repository.IAuthApiRepository
-import com.paraskcd.unitedsetups.data.repository.authentication.AuthApiRepository
 import com.paraskcd.unitedsetups.core.requests.authentication.LoginRequest
 import com.paraskcd.unitedsetups.core.requests.authentication.RegisterRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +31,9 @@ class AuthenticationViewModel @Inject constructor(
     var isLoggedIn by mutableStateOf(false)
         private set
 
+    var isLoading by mutableStateOf(false)
+        private set
+
     fun updateEmail(input: String) {
         email = input
     }
@@ -49,13 +51,17 @@ class AuthenticationViewModel @Inject constructor(
     }
 
     suspend fun login() {
+        isLoading = true
         val response = authApiRepository.Login(LoginRequest(email, password))
         tokenManager.saveToken(authData = response.data)
         isLoggedIn = true
+        isLoading = false
     }
 
     suspend fun register(): Exception? {
+        isLoading = true
         val response = authApiRepository.Register(RegisterRequest(username, email, name, password))
+        isLoading = false
         return response.ex
     }
 }

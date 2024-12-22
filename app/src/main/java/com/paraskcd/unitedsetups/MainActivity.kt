@@ -61,14 +61,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(
-                DarkColorScheme.surface.hashCode()
-            ),
-            navigationBarStyle = SystemBarStyle.dark(
-                DarkColorScheme.surface.hashCode()
-            )
-        )
+        enableEdgeToEdge()
         setContent {
             val mainViewModel: MainActivityViewModel = hiltViewModel()
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
@@ -246,7 +239,6 @@ class MainActivity : ComponentActivity() {
                         authenticationViewModel = authenticationViewModel
                     )
                 }
-
             }
         }
     }

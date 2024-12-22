@@ -72,7 +72,6 @@ fun PostThreadItem(
         modifier = Modifier
             .padding(horizontal = firstPadding())
             .fillMaxWidth()
-            .shadow(elevation = 16.dp)
             .background(
                 DarkColorScheme.surface,
                 shape = getShape()
