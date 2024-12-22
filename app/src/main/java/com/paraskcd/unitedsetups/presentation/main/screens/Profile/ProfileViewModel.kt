@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paraskcd.unitedsetups.core.common.Constants
+import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IUserApiRepository
 import com.paraskcd.unitedsetups.core.requests.posts.GetPostsRequest
@@ -19,7 +20,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userApiRepository: IUserApiRepository,
-    private val postApiRepository: IPostApiRepository
+    private val postApiRepository: IPostApiRepository,
+    private val tokenManager: TokenManager
 ) : ViewModel() {
     val user = mutableStateOf<User?>(null)
     val posts = mutableStateOf<List<Post>>(emptyList())

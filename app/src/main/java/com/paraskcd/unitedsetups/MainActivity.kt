@@ -230,7 +230,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding),
                             navController = navController,
                             homeViewModel = homeViewModel,
-                            postViewModel = postViewModel
+                            postViewModel = postViewModel,
+                            { authenticationViewModel.signOut() }
                         )
                     }
                 } else {

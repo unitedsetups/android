@@ -64,4 +64,9 @@ class AuthenticationViewModel @Inject constructor(
         isLoading = false
         return response.ex
     }
+
+    fun signOut() {
+        tokenManager.logout()
+        isLoggedIn = false
+    }
 }

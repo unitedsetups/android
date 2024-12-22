@@ -18,6 +18,7 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
             editor.putString(Constants.TOKEN_KEY, it.token).apply()
             editor.putString(Constants.USER_ID_KEY, it.id).apply()
             editor.putBoolean(Constants.IS_LOGGED_IN_KEY, true).apply()
+            return
         }
     }
 
@@ -31,5 +32,12 @@ class TokenManager @Inject constructor(@ApplicationContext context: Context) {
 
     fun getUserId(): String? {
         return preferences.getString(Constants.USER_ID_KEY, null)
+    }
+
+    fun logout() {
+        val editor = preferences.edit()
+        editor.remove(Constants.TOKEN_KEY).apply()
+        editor.remove(Constants.USER_ID_KEY).apply()
+        editor.remove(Constants.IS_LOGGED_IN_KEY).apply()
     }
 }

@@ -24,7 +24,7 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(navController: NavHostController, userId: String? = null) {
+fun Profile(navController: NavHostController, userId: String? = null, signout: () -> Unit) {
     val viewModel: ProfileViewModel = hiltViewModel()
     var user by remember { viewModel.user }
     var posts by remember { viewModel.posts }
@@ -66,7 +66,11 @@ fun Profile(navController: NavHostController, userId: String? = null) {
     ) {
         LazyColumn {
             item {
-                ProfileHeader(user)
+                ProfileHeader(
+                    user,
+                    showSignout = userId == null,
+                    signout = signout
+                )
             }
             item {
                 Spacer(modifier = Modifier.height(24.dp))
