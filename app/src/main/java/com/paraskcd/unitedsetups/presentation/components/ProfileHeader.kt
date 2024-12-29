@@ -4,17 +4,26 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Logout
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.DevicesOther
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,8 +46,11 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun ProfileHeader(user: User?) {
+fun ProfileHeader(user: User?, showSignout: Boolean = false, signout: () -> Unit) {
     var showShimmerCover by remember { mutableStateOf(true) }
+    var menuExpanded by remember {
+        mutableStateOf(false)
+    }
 
     Box(
         contentAlignment = Alignment.BottomCenter,
@@ -50,7 +62,7 @@ fun ProfileHeader(user: User?) {
     ) {
         if (user?.coverImageUrl?.isNotEmpty() == true) {
             AsyncImage(
-                model = Uri.parse("${Constants.BASE_URL}/${user?.coverImageUrl}"),
+                model = Uri.parse("${Constants.BASE_URL}/${user.coverImageUrl}"),
                 contentDescription = "Cover Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -75,8 +87,56 @@ fun ProfileHeader(user: User?) {
                 brush = Brush.verticalGradient(
                     colors = listOf(DarkColorScheme.surface, Color.Transparent)
                 )
-            )
-        )
+            ),
+            contentAlignment = Alignment.TopEnd
+        ) {
+            if (showSignout) {
+                Column(
+                    modifier = Modifier.padding(end = 16.dp, top = 16.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    IconButton (onClick = { menuExpanded = !menuExpanded }) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = "More",
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = menuExpanded,
+                        onDismissRequest = { menuExpanded = false },
+                        modifier = Modifier.background(DarkColorScheme.surface)
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Edit,
+                                        contentDescription = "Edit Profile",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Edit Profile")
+                                }
+                            },
+                            onClick = { },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Outlined.Logout,
+                                        contentDescription = "Logout",
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Logout")
+                                }
+                            },
+                            onClick = { signout() },
+                        )
+                    }
+                }
+            }
+        }
         Column(modifier = Modifier
             .offset(y = 100.dp),
             horizontalAlignment = Alignment.CenterHorizontally

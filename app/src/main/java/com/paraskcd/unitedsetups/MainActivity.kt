@@ -2,7 +2,6 @@ package com.paraskcd.unitedsetups
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
@@ -82,12 +81,12 @@ class MainActivity : ComponentActivity() {
             val currentRouteId by remember { derivedStateOf { currentBackStackEntry?.destination?.id } }
 
             UnitedSetupsTheme {
-                if (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn) {
+                if (authenticationViewModel.isLoggedIn) {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         floatingActionButton = {
                             if (topLevelRoutes.any { it.route == currentRoute }
-                                && (authenticationViewModel.isLoggedIn || mainViewModel.isLoggedIn)) {
+                                && (authenticationViewModel.isLoggedIn)) {
                                 if (currentRouteId != null) {
                                     FloatingActionButton(
                                         onClick = { navController.navigate("NewPost") {
@@ -230,7 +229,8 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding),
                             navController = navController,
                             homeViewModel = homeViewModel,
-                            postViewModel = postViewModel
+                            postViewModel = postViewModel,
+                            { authenticationViewModel.signOut() }
                         )
                     }
                 } else {

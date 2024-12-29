@@ -20,7 +20,7 @@ import com.paraskcd.unitedsetups.presentation.main.screens.Profile.Profile
 import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
 
 @Composable
-fun MainView(modifier: Modifier = Modifier, navController: NavHostController, homeViewModel: HomeViewModel, postViewModel: PostViewModel) {
+fun MainView(modifier: Modifier = Modifier, navController: NavHostController, homeViewModel: HomeViewModel, postViewModel: PostViewModel, signout: () -> Unit) {
     NavHost(
         navController = navController,
         startDestination = "Home",
@@ -34,7 +34,7 @@ fun MainView(modifier: Modifier = Modifier, navController: NavHostController, ho
             Home(navController = navController, viewModel = homeViewModel)
         }
         composable(route = "Profile") {
-            Profile(navController = navController)
+            Profile(navController = navController, signout = signout)
         }
         composable(route = "Profile/{userId}") { backstackEntry ->
             var userId = backstackEntry.arguments?.getString("userId")
@@ -48,7 +48,7 @@ fun MainView(modifier: Modifier = Modifier, navController: NavHostController, ho
                 }
             }
             userId?.let {
-                Profile(navController = navController, userId = userId)
+                Profile(navController = navController, userId = userId, signout)
             }
         }
         composable("NewPost") {

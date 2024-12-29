@@ -205,18 +205,9 @@ fun AuthenticationView(modifier: Modifier = Modifier, authenticationViewModel: A
                     onClick = {
                         composableScope.launch {
                             if (register) {
-                                val error = authenticationViewModel.register()
-                                if (error == null) {
-                                    register = false
-                                } else {
-                                    Toast.makeText(
-                                        context,
-                                        error.message,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
+                                authenticationViewModel.register(context)
                             } else {
-                                authenticationViewModel.login()
+                                authenticationViewModel.login(context)
                             }
                         }
                     },
