@@ -1,11 +1,13 @@
 package com.paraskcd.unitedsetups.presentation.main.screens.Profile
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paraskcd.unitedsetups.core.common.Constants
+import com.paraskcd.unitedsetups.core.common.DataOrException
 import com.paraskcd.unitedsetups.core.common.TokenManager
 import com.paraskcd.unitedsetups.core.interfaces.repository.IPostApiRepository
 import com.paraskcd.unitedsetups.core.interfaces.repository.IUserApiRepository
@@ -48,7 +50,12 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Main) {
             pageIndex.value = 0
             loading.value = true
-            val result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, userId))
+            var result: DataOrException<List<Post>, Exception>? = null
+            if (userId.isNullOrBlank()) {
+                result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, userId))
+            } else {
+                result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, user.value?.id))
+            }
             posts.value = result.data ?: emptyList()
             loading.value = false
             if (result.data?.isNotEmpty() == true) {

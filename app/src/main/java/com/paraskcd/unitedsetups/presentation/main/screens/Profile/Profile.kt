@@ -34,9 +34,12 @@ fun Profile(navController: NavHostController, userId: String? = null, signout: (
     val pullRefreshState = rememberPullToRefreshState()
     val localContext = LocalContext.current
 
+    var myUserId by remember { mutableStateOf("") }
+
     LaunchedEffect(viewModel) {
         if (userId == null) {
             viewModel.getMyProfile()
+            myUserId = viewModel.user.value!!.id
         }
         if (userId != null) {
             viewModel.getUserById(userId)

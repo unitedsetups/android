@@ -1,5 +1,8 @@
 package com.paraskcd.unitedsetups.presentation.authentication
 
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -50,19 +53,57 @@ class AuthenticationViewModel @Inject constructor(
         username = input
     }
 
-    suspend fun login() {
-        isLoading = true
-        val response = authApiRepository.Login(LoginRequest(email, password))
-        tokenManager.saveToken(authData = response.data)
-        isLoggedIn = true
-        isLoading = false
+    init {
+        isLoggedIn = tokenManager.isLoggedIn()
     }
 
-    suspend fun register(): Exception? {
+    suspend fun login(context: Context) {
         isLoading = true
-        val response = authApiRepository.Register(RegisterRequest(username, email, name, password))
-        isLoading = false
-        return response.ex
+        try {
+            val response = authApiRepository.Login(LoginRequest(email, password))
+            response.ex?.let { e ->
+                throw Exception(e)
+            }
+            response.data?.let { data ->
+                tokenManager.saveToken(authData = response.data)
+                isLoggedIn = true
+                isLoading = false
+            }
+        } catch (e: Exception) {
+            if (e.message != null) {
+                if (e.message!!.contains("401")) {
+                    Toast.makeText(context, "Invalid Email or Password", Toast.LENGTH_SHORT).show()
+                    isLoading = false
+                }
+            } else {
+                Toast.makeText(context, "Something went wrong, please try again", Toast.LENGTH_SHORT).show()
+                isLoading = false
+            }
+        }
+    }
+
+    suspend fun register(context: Context) {
+        isLoading = true
+        try {
+            val response = authApiRepository.Register(RegisterRequest(username, email, name, password))
+            response.ex?.let { e ->
+                throw Exception(e)
+            }
+            response.data?.let { data ->
+                tokenManager.saveToken(authData = response.data)
+                isLoggedIn = true
+            }
+        } catch (e: Exception) {
+            if (e.message != null) {
+                if (e.message!!.contains("400")) {
+                    Toast.makeText(context, "Please check your inputs", Toast.LENGTH_SHORT).show()
+                    isLoading = false
+                }
+            } else {
+                Toast.makeText(context, "Something went wrong, please try again", Toast.LENGTH_SHORT).show()
+                isLoading = false
+            }
+        }
     }
 
     fun signOut() {
