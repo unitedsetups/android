@@ -3,20 +3,17 @@ package com.paraskcd.unitedsetups.presentation.main
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.paraskcd.unitedsetups.presentation.main.screens.home.Home
 import com.paraskcd.unitedsetups.presentation.main.screens.NewPost.NewPost
 import com.paraskcd.unitedsetups.presentation.main.screens.Post.Post
 import com.paraskcd.unitedsetups.presentation.main.screens.Post.PostViewModel
 import com.paraskcd.unitedsetups.presentation.main.screens.PostImage.PostImage
 import com.paraskcd.unitedsetups.presentation.main.screens.Profile.Profile
+import com.paraskcd.unitedsetups.presentation.main.screens.home.Home
 import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
 
 @Composable
