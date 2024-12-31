@@ -24,8 +24,7 @@ import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Profile(navController: NavHostController, userId: String? = null, signout: () -> Unit) {
-    val viewModel: ProfileViewModel = hiltViewModel()
+fun Profile(navController: NavHostController, userId: String? = null, signout: () -> Unit, viewModel: ProfileViewModel) {
     var user by remember { viewModel.user }
     var posts by remember { viewModel.posts }
     var loading by remember { viewModel.loading }
@@ -33,18 +32,6 @@ fun Profile(navController: NavHostController, userId: String? = null, signout: (
     val postIdLoading by remember { viewModel.postIdLoading }
     val pullRefreshState = rememberPullToRefreshState()
     val localContext = LocalContext.current
-
-    var myUserId by remember { mutableStateOf("") }
-
-    LaunchedEffect(viewModel) {
-        if (userId == null) {
-            viewModel.getMyProfile()
-            myUserId = viewModel.user.value!!.id
-        }
-        if (userId != null) {
-            viewModel.getUserById(userId)
-        }
-    }
 
     PullToRefreshBox(
         modifier = Modifier

@@ -50,6 +50,7 @@ import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationView
 import com.paraskcd.unitedsetups.presentation.authentication.AuthenticationViewModel
 import com.paraskcd.unitedsetups.presentation.main.MainView
 import com.paraskcd.unitedsetups.presentation.main.screens.Post.PostViewModel
+import com.paraskcd.unitedsetups.presentation.main.screens.Profile.ProfileViewModel
 import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 import com.paraskcd.unitedsetups.ui.theme.UnitedSetupsTheme
@@ -62,7 +63,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val mainViewModel: MainActivityViewModel = hiltViewModel()
+            val profileViewModel: ProfileViewModel = hiltViewModel()
             val authenticationViewModel: AuthenticationViewModel = hiltViewModel()
             val homeViewModel: HomeViewModel = hiltViewModel()
             val postViewModel: PostViewModel = hiltViewModel()
@@ -229,6 +230,7 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.padding(innerPadding),
                             navController = navController,
                             homeViewModel = homeViewModel,
+                            profileViewModel = profileViewModel,
                             postViewModel = postViewModel,
                             { authenticationViewModel.signOut() }
                         )

@@ -41,9 +41,10 @@ class ProfileViewModel @Inject constructor(
         user.value = result.data
     }
 
-    suspend fun getMyProfile() {
+    suspend fun getMyProfile(): User? {
         val result = userApiRepository.getMyProfile()
         user.value = result.data
+        return result.data
     }
 
     fun getPostsByUserId(userId: String?) {
@@ -51,14 +52,15 @@ class ProfileViewModel @Inject constructor(
             pageIndex.value = 0
             loading.value = true
             var result: DataOrException<List<Post>, Exception>? = null
+            Log.d("ProfileViewModel", "userId: ${user.value?.id}")
             if (userId.isNullOrBlank()) {
                 result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, userId))
-            } else {
+            } else if (user.value != null){
                 result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, user.value?.id))
             }
-            posts.value = result.data ?: emptyList()
+            posts.value = result?.data ?: emptyList()
             loading.value = false
-            if (result.data?.isNotEmpty() == true) {
+            if (result?.data?.isNotEmpty() == true) {
                 pageIndex.value = pageIndex.value + 1
             } else {
                 stopFetching.value = true

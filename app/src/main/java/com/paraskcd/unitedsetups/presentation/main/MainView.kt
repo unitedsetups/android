@@ -1,26 +1,29 @@
 package com.paraskcd.unitedsetups.presentation.main
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.paraskcd.unitedsetups.presentation.main.screens.home.Home
 import com.paraskcd.unitedsetups.presentation.main.screens.NewPost.NewPost
 import com.paraskcd.unitedsetups.presentation.main.screens.Post.Post
 import com.paraskcd.unitedsetups.presentation.main.screens.Post.PostViewModel
 import com.paraskcd.unitedsetups.presentation.main.screens.PostImage.PostImage
 import com.paraskcd.unitedsetups.presentation.main.screens.Profile.Profile
+import com.paraskcd.unitedsetups.presentation.main.screens.Profile.ProfileViewModel
+import com.paraskcd.unitedsetups.presentation.main.screens.home.Home
 import com.paraskcd.unitedsetups.presentation.main.screens.home.HomeViewModel
+import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
-fun MainView(modifier: Modifier = Modifier, navController: NavHostController, homeViewModel: HomeViewModel, postViewModel: PostViewModel, signout: () -> Unit) {
+fun MainView(modifier: Modifier = Modifier, navController: NavHostController, homeViewModel: HomeViewModel, profileViewModel: ProfileViewModel, postViewModel: PostViewModel, signout: () -> Unit) {
+    val coroutineScope = rememberCoroutineScope()
     NavHost(
         navController = navController,
         startDestination = "Home",
@@ -34,7 +37,13 @@ fun MainView(modifier: Modifier = Modifier, navController: NavHostController, ho
             Home(navController = navController, viewModel = homeViewModel)
         }
         composable(route = "Profile") {
-            Profile(navController = navController, signout = signout)
+            coroutineScope.launch {
+                val data = profileViewModel.getMyProfile()
+                if (data != null) {
+                    profileViewModel.getPostsByUserId(data.id)
+                }
+            }
+            Profile(navController = navController, signout = signout, viewModel = profileViewModel)
         }
         composable(route = "Profile/{userId}") { backstackEntry ->
             var userId = backstackEntry.arguments?.getString("userId")
@@ -47,8 +56,14 @@ fun MainView(modifier: Modifier = Modifier, navController: NavHostController, ho
                     restoreState = true
                 }
             }
+            if (userId != null) {
+                coroutineScope.launch {
+                    profileViewModel.getUserById(userId)
+                    profileViewModel.getPostsByUserId(userId)
+                }
+            }
             userId?.let {
-                Profile(navController = navController, userId = userId, signout)
+                Profile(navController = navController, userId = userId, signout, viewModel = profileViewModel)
             }
         }
         composable("NewPost") {
