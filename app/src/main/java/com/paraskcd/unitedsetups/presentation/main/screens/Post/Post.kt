@@ -11,8 +11,10 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,9 +43,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -179,59 +184,10 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                     .onGloballyPositioned { coordinates ->
                         columnHeightDp = with(localDensity) { coordinates.size.height.toDp() }
                     }
-                    .imePadding()
             ) {
-                replyPostThread?.let { postThread ->
-                    Row (
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .background(
-                                color = Color.White.copy(alpha = 0.05f),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            Icon(imageVector = Icons.Outlined.Forum, contentDescription = "Image")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Column {
-                                Text("Reply to:")
-                                Text("${postThread.postedBy.username}: ${postThread.text}")
-                            }
-                        }
-                        IconButton(onClick = { viewModel.replyParentPostThread.value = null }) {
-                            Icon(imageVector = Icons.Filled.Close, contentDescription = "Image")
-                        }
-                    }
-                }
-                TextField(
-                    value = viewModel.text,
-                    onValueChange = { text -> viewModel.updateText(text) },
-                    label = { Text("What's on your mind?") },
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        disabledIndicatorColor = Color.Transparent,
-                        errorIndicatorColor = DarkColorScheme.error
-                    ),
-                    maxLines = 22,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .background(DarkColorScheme.surface),
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     IconButton(onClick = { launchPhotoPicker() }, modifier = Modifier.padding(start = 16.dp)) {
@@ -240,6 +196,55 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                     IconButton(onClick = { createNewPostThread() }, modifier = Modifier.padding(end = 16.dp)) {
                         Icon(imageVector = Icons.Filled.Send, contentDescription = "Send")
                     }
+                }
+                Column {
+                    replyPostThread?.let { postThread ->
+                        Row (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .background(
+                                    color = Color.White.copy(alpha = 0.05f),
+                                    shape = RoundedCornerShape(16.dp)
+                                ),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(horizontal = 8.dp)
+                            ) {
+                                Icon(imageVector = Icons.Outlined.Forum, contentDescription = "Image")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column {
+                                    Text("Reply to:")
+                                    Text("${postThread.postedBy.username}: ${postThread.text}")
+                                }
+                            }
+                            IconButton(onClick = { viewModel.replyParentPostThread.value = null }) {
+                                Icon(imageVector = Icons.Filled.Close, contentDescription = "Image")
+                            }
+                        }
+                    }
+                    TextField(
+                        value = viewModel.text,
+                        onValueChange = { text -> viewModel.updateText(text) },
+                        label = { Text("What's on your mind?") },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                            errorContainerColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                            disabledIndicatorColor = Color.Transparent,
+                            errorIndicatorColor = DarkColorScheme.error
+                        ),
+                        singleLine = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp)
+                    )
                 }
             }
         }
