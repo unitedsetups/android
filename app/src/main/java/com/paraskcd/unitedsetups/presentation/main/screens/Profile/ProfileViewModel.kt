@@ -49,10 +49,10 @@ class ProfileViewModel @Inject constructor(
 
     fun getPostsByUserId(userId: String?) {
         viewModelScope.launch(Dispatchers.Main) {
+            posts.value = emptyList()
             pageIndex.value = 0
             loading.value = true
             var result: DataOrException<List<Post>, Exception>? = null
-            Log.d("ProfileViewModel", "userId: ${user.value?.id}")
             if (userId.isNullOrBlank()) {
                 result = postApiRepository.getPosts(GetPostsRequest(null, pageIndex.value, Constants.PAGE_SIZE, userId))
             } else if (user.value != null){
