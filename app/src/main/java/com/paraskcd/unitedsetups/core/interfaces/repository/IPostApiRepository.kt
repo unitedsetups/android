@@ -12,4 +12,5 @@ interface IPostApiRepository {
     suspend fun getPostById(postId: String): DataOrException<Post, Exception>
     suspend fun likePost(postId: String): DataOrException<Post, Exception>
     suspend fun dislikePost(postId: String): DataOrException<Post, Exception>
+    suspend fun deletePost(postId: String): DataOrException<Unit, Exception>
 }

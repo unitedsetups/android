@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -13,13 +15,16 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
+import com.paraskcd.unitedsetups.presentation.components.AlertDialogComponent
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
@@ -38,6 +43,8 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
     val pullRefreshState = rememberPullToRefreshState()
     val postIdLoading by remember { viewModel.postIdLoading }
     val localContext = LocalContext.current
+    var openAlertDialog by remember { mutableStateOf(false) }
+    var deletePostId by remember { mutableStateOf("") }
 
     // after each scroll, update values in ViewModel
     LaunchedEffect(key1 = listState.isScrollInProgress) {
@@ -66,6 +73,15 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
             )
         }
     ) {
+        if (openAlertDialog == true) {
+            AlertDialogComponent(
+                onDismissRequest = { openAlertDialog = false },
+                onConfirmation = { viewModel.deletePost(deletePostId) },
+                dialogTitle = "Delete Post",
+                dialogText = "Are you sure you want to delete this post?",
+                icon = Icons.Outlined.DeleteForever
+            )
+        }
         LazyColumn(
             state = listState
         ) {
@@ -82,7 +98,11 @@ fun Home(modifier: Modifier = Modifier, navController: NavHostController, viewMo
                     navController,
                     postIdLoading,
                     { postId, isLiked -> viewModel.likePost(postId, isLiked) },
-                    { postId -> startActivity(localContext, viewModel.share(postId), null) }
+                    { postId -> startActivity(localContext, viewModel.share(postId), null) },
+                    { postId ->
+                        deletePostId = postId
+                        openAlertDialog = true
+                    }
                 )
             }
             item {

@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
@@ -15,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.paraskcd.unitedsetups.presentation.components.AlertDialogComponent
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
 import com.paraskcd.unitedsetups.presentation.components.ProfileHeader
@@ -32,6 +34,8 @@ fun Profile(navController: NavHostController, userId: String? = null, signout: (
     val postIdLoading by remember { viewModel.postIdLoading }
     val pullRefreshState = rememberPullToRefreshState()
     val localContext = LocalContext.current
+    var openAlertDialog by remember { mutableStateOf(false) }
+    var deletePostId by remember { mutableStateOf("") }
 
     PullToRefreshBox(
         modifier = Modifier
@@ -54,6 +58,15 @@ fun Profile(navController: NavHostController, userId: String? = null, signout: (
             )
         }
     ) {
+        if (openAlertDialog == true) {
+            AlertDialogComponent(
+                onDismissRequest = { openAlertDialog = false },
+                onConfirmation = { viewModel.deletePost(deletePostId) },
+                dialogTitle = "Delete Post",
+                dialogText = "Are you sure you want to delete this post?",
+                icon = Icons.Outlined.DeleteForever
+            )
+        }
         LazyColumn {
             item {
                 ProfileHeader(
@@ -79,7 +92,11 @@ fun Profile(navController: NavHostController, userId: String? = null, signout: (
                         navController,
                         postIdLoading,
                         { postId, isLiked -> viewModel.likePost(postId, isLiked) },
-                        { postId -> startActivity(localContext, viewModel.share(postId), null)}
+                        { postId -> startActivity(localContext, viewModel.share(postId), null)},
+                        { postId ->
+                            deletePostId = postId
+                            openAlertDialog = true
+                        }
                     )
                 }
             }

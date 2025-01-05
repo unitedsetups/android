@@ -11,14 +11,11 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,12 +41,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.findRootCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -56,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.paraskcd.unitedsetups.presentation.components.AlertDialogComponent
 import com.paraskcd.unitedsetups.presentation.components.PostItem
 import com.paraskcd.unitedsetups.presentation.components.PostSkeleton
 import com.paraskcd.unitedsetups.presentation.components.PostThreadItem
@@ -81,6 +77,7 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
 
     val window = (LocalView.current.context as Activity).window
     val navbarColor = DarkColorScheme.surface.toArgb()
+    var openAlertDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(postId) {
         viewModel.getPostById(postId)
@@ -137,6 +134,18 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                 window.navigationBarColor = Color.Transparent.toArgb()
             }
         }
+        if (openAlertDialog == true) {
+            AlertDialogComponent(
+                onDismissRequest = { openAlertDialog = false },
+                onConfirmation = {
+                    viewModel.deletePost()
+                    navController.popBackStack()
+                },
+                dialogTitle = "Delete Post",
+                dialogText = "Are you sure you want to delete this post?",
+                icon = Icons.Outlined.DeleteForever
+            )
+        }
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
                 Spacer(modifier = Modifier.height(24.dp))
@@ -152,7 +161,8 @@ fun Post(postId: String, navController: NavHostController, viewModel: PostViewMo
                         navController,
                         postIdLoading,
                         { _, isLiked -> viewModel.likePost(isLiked) },
-                        { startActivity(localContext, viewModel.share(), null) }
+                        { startActivity(localContext, viewModel.share(), null) },
+                        { openAlertDialog = true }
                     )
                 }
                 items(postData.postThreads) { postThread ->

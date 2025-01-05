@@ -3,6 +3,7 @@ package com.paraskcd.unitedsetups.core.interfaces.apis
 import com.paraskcd.unitedsetups.core.entities.posts.PostApiEntity
 import com.paraskcd.unitedsetups.core.requests.posts.CreateNewPostRequest
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -18,6 +19,9 @@ interface IPostApi {
 
     @GET("posts/{postId}")
     suspend fun getPostById(@Path("postId") postId: String): PostApiEntity
+
+    @DELETE("posts/{postId}")
+    suspend fun deletePost(@Path("postId") postId: String)
 
     @PUT("posts/{postId}/like")
     suspend fun likePost(@Path("postId") postId: String): PostApiEntity
