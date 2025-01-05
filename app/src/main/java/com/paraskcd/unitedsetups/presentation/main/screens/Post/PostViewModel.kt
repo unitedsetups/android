@@ -153,4 +153,12 @@ class PostViewModel @Inject constructor(
     fun getReplyPostThread(postThread: PostThread) {
         replyParentPostThread.value = postThread
     }
+
+    fun deletePost() {
+        viewModelScope.launch {
+            post.value?.id?.let { postId ->
+                postApiRepository.deletePost(postId)
+            }
+        }
+    }
 }

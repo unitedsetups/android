@@ -115,4 +115,11 @@ class ProfileViewModel @Inject constructor(
         }
         return Intent.createChooser(sendIntent, null)
     }
+
+    fun deletePost(postId: String) {
+        viewModelScope.launch {
+            postApiRepository.deletePost(postId)
+            posts.value = posts.value.filter { it.id != postId }
+        }
+    }
 }

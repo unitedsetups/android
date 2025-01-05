@@ -49,7 +49,7 @@ import com.paraskcd.unitedsetups.presentation.brushes.shimmerBrush
 import com.paraskcd.unitedsetups.ui.theme.DarkColorScheme
 
 @Composable
-fun PostHeader(post: Post, loggedInUserId: String?, navController: NavHostController) {
+fun PostHeader(post: Post, loggedInUserId: String?, navController: NavHostController, deletePost: (String) -> Unit) {
     var menuExpanded by remember {
         mutableStateOf(false)
     }
@@ -178,7 +178,7 @@ fun PostHeader(post: Post, loggedInUserId: String?, navController: NavHostContro
                                     )
                                 }
                             },
-                            onClick = { /* TODO */ },
+                            onClick = { deletePost(post.id) },
                         )
                     }
                     else {

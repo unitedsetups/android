@@ -40,6 +40,15 @@ class PostApiRepository @Inject constructor(private val postApi: IPostApi) : IPo
         }
     }
 
+    override suspend fun deletePost(postId: String): DataOrException<Unit, Exception> {
+        return try {
+            DataOrException(postApi.deletePost(postId), null)
+        } catch (ex: Exception) {
+            Log.e("deletePost", ex.message.toString())
+            DataOrException(null, ex)
+        }
+    }
+
     override suspend fun likePost(postId: String): DataOrException<Post, Exception> {
         return try {
             DataOrException(postApi.likePost(postId).toPost(), null)

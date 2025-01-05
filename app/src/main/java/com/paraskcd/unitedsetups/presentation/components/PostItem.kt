@@ -21,7 +21,8 @@ fun PostItem(
     navController: NavHostController,
     postIdLoading: String?,
     likePost: (String, Boolean) -> Unit,
-    sharePost: (String) -> Unit
+    sharePost: (String) -> Unit,
+    deletePost: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -37,7 +38,7 @@ fun PostItem(
                 navController.navigate("Post/${post.id}")
             }
     ) {
-        PostHeader(post, loggedInUserId, navController)
+        PostHeader(post, loggedInUserId, navController, deletePost)
         PostMedia(post, navController)
         PostFooter(post, likePost, postIdLoading, navController, sharePost)
     }
